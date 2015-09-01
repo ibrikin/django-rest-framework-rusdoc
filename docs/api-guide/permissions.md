@@ -1,29 +1,39 @@
 source: permissions.py
 
-# Permissions
+# Permissions | Разрешения
 
 > Authentication or identification by itself is not usually sufficient to gain access to information or code.  For that, the entity requesting access must have authorization.
+> Аутентификация или идентификация сама по себе не достаточное условие для того чтобы получить доступ к информации или коду. Для этого, тот кто запрашивает доступ должен быть авторизован.
 >
 > &mdash; [Apple Developer Documentation][cite]
 
 Together with [authentication] and [throttling], permissions determine whether a request should be granted or denied access.
+Вместе с [authentication] и [throttling], разрешения определяют следует ли получить или оказать в доступе для запроса
 
 Permission checks are always run at the very start of the view, before any other code is allowed to proceed.  Permission checks will typically use the authentication information in the `request.user` and `request.auth` properties to determine if the incoming request should be permitted.
+Проверка разрешения всегда запускается в самом начале view, до того как другому коду подет позволено выполнится.  Проверка разрешения будет обычно использована аутентификация информация в `request.user` и `request.auth` для определения разрешения во входящем запросе.
 
 Permissions are used to grant or deny access different classes of users to different parts of the API.
+Разрешения используются для разрешения или запрета доступа различных классов пользователей к различным частям API.
 
 The simplest style of permission would be to allow access to any authenticated user, and deny access to any unauthenticated user. This corresponds the `IsAuthenticated` class in REST framework.
+Простейший стиль разрешения должен давать разрешение на доступ любому авторизованому пользователю, и отказывать в доступе любому не авторизованому пользователю. Это похоже на `IsAuthenticated` класс в REST framework.
 
 A slightly less strict style of permission would be to allow full access to authenticated users, but allow read-only access to unauthenticated users. This corresponds to the `IsAuthenticatedOrReadOnly` class in REST framework.
+Немного менее строгий стиль разрешения должен позволять полный доступ для авторизованых пользователей, но еще позволять только чтение неавторизованым пользователям. Это связано с `IsAuthenticatedOrReadOnly` классом в REST framework.
 
-## How permissions are determined
+## How permissions are determined | Как разрешения определяются
 
 Permissions in REST framework are always defined as a list of permission classes.
+Разрешение в REST framework постоянно определяются как список класов
 
 Before running the main body of the view each permission in the list is checked.
 If any permission check fails an `exceptions.PermissionDenied` or `exceptions.NotAuthenticated` exception will be raised, and the main body of the view will not run.
+Прежде чем запустить тело view каждое разрешение в списке проверяется.
+Если какая либо проверка разрешения заканчивается `exceptions.PermissionDenied` или `exceptions.NotAuthenticated`, то главное тело view не будет запущено.
 
 When the permissions checks fail either a "403 Forbidden" or a "401 Unauthorized" response will be returned, according to the following rules:
+Когда проверка разрешения заканчивается "403 Forbidden" или "401 Unauthorized" ответом, в соответсвии следующим правилам:
 
 * The request was successfully authenticated, but permission was denied. *&mdash; An HTTP 403 Forbidden response will be returned.*
 * The request was not successfully authenticated, and the highest priority authentication class *does not* use `WWW-Authenticate` headers. *&mdash; An HTTP 403 Forbidden response will be returned.*

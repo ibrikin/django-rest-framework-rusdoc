@@ -13,8 +13,10 @@
 ---
 
 **Note**: This is the documentation for the **version 3.2** of REST framework. Documentation for [version 2.4](http://tomchristie.github.io/rest-framework-2-docs/) is also available.
+**Примечание**: Это документация для версии **3.2**. Документация для [version 2.4](http://tomchristie.github.io/rest-framework-2-docs/) также доступна.
 
 For more details see the 3.2 [announcement][3.2-announcement] and [release notes][release-notes].
+Для более подробной информации смотрите 3.2 [Последние изменения][3.2-announcement] и [примечания к выпуску][release-notes].
 
 ---
 
@@ -32,48 +34,62 @@ For more details see the 3.2 [announcement][3.2-announcement] and [release notes
 </p>
 
 Django REST framework is a powerful and flexible toolkit that makes it easy to build Web APIs.
+Django REST framework - мощный и гибкий инструмент для создания  Web APIs.
 
 Some reasons you might want to use REST framework:
+Некоторые причины из-за которых вы захотите использовать REST framework:
 
 * The [Web browsable API][sandbox] is a huge usability win for your developers.
+* [Web-интерфейс для API][sandbox] - удобство для ваших разработчиком.
 * [Authentication policies][authentication] including packages for [OAuth1a][oauth1-section] and [OAuth2][oauth2-section].
+* [Авторизация][authentication] включает пакеты для [OAuth1a][oauth1-section] и [OAuth2][oauth2-section].
 * [Serialization][serializers] that supports both [ORM][modelserializer-section] and [non-ORM][serializer-section] data sources.
+* [Сериализация][serializers] поддерживает как [ORM][modelserializer-section] так и [non-ORM][serializer-section] источники.
 * Customizable all the way down - just use [regular function-based views][functionview-section] if you don't need the [more][generic-views] [powerful][viewsets] [features][routers].
+* Настраивается все - just use [regular function-based views][functionview-section] if you don't need the [more][generic-views] [powerful][viewsets] [features][routers].
 * [Extensive documentation][index], and [great community support][group].
+* [Обширная документация][index], и [отличное сообщество поддержки][group].
 * Used and trusted by large companies such as [Mozilla][mozilla] and [Eventbrite][eventbrite].
+* Используют и доверяют в больших компаниях как [Mozilla][mozilla] и [Eventbrite][eventbrite].
 
 ---
 
 ![Screenshot][image]
 
 **Above**: *Screenshot from the browsable API*
+**Выше**: *Скриншот Web-интерфейса для API*
 
-## Requirements
+## Requirements | Требования
 
 REST framework requires the following:
+REST framework требует следующее:
 
 * Python (2.6.5+, 2.7, 3.2, 3.3, 3.4)
 * Django (1.5.6+, 1.6.3+, 1.7+, 1.8)
 
 The following packages are optional:
+Следующие пакеты и модули опционально:
 
 * [Markdown][markdown] (2.1.0+) - Markdown support for the browsable API.
 * [django-filter][django-filter] (0.9.2+) - Filtering support.
 * [django-guardian][django-guardian] (1.1.1+) - Object level permissions support.
 
-## Installation
+## Installation | Установка
 
 Install using `pip`, including any optional packages you want...
+Устанавить используюя `pip`, включая любые модули и пакеты по желанию...
 
     pip install djangorestframework
     pip install markdown       # Markdown support for the browsable API.
     pip install django-filter  # Filtering support
 
 ...or clone the project from github.
+...или клонируй из github.
 
     git clone git@github.com:tomchristie/django-rest-framework.git
 
 Add `'rest_framework'` to your `INSTALLED_APPS` setting.
+Добавь `'rest_framework'` в свои `INSTALLED_APPS` настройки setting.py
 
     INSTALLED_APPS = (
         ...
@@ -81,6 +97,7 @@ Add `'rest_framework'` to your `INSTALLED_APPS` setting.
     )
 
 If you're intending to use the browsable API you'll probably also want to add REST framework's login and logout views.  Add the following to your root `urls.py` file.
+Если вы планируете использовать Web-интерфейс, то возможно вы захотите добавить login и logout views.  Добавьте следующее к вашему корневому `urls.py`
 
     urlpatterns = [
         ...
@@ -88,12 +105,15 @@ If you're intending to use the browsable API you'll probably also want to add RE
     ]
 
 Note that the URL path can be whatever you want, but you must include `'rest_framework.urls'` with the `'rest_framework'` namespace.
+Заметьте, что URL путь может быть каким вы хотите, но вы должны включить `'rest_framework.urls'` с `'rest_framework'` пространством имен.
 
-## Example
+## Example | Пример
 
 Let's take a look at a quick example of using REST framework to build a simple model-backed API.
+Давайте рассмотрим быстрый пример использования REST framework для построения простого API.
 
 We'll create a read-write API for accessing information on the users of our project.
+Мы создадим API с возможностью чтения-записи для доступа к информации о пользователях нашего проекта.
 
 Any global settings for a REST framework API are kept in a single configuration dictionary named `REST_FRAMEWORK`.  Start off by adding the following to your `settings.py` module:
 

@@ -1,30 +1,36 @@
 source: authentication.py
 
-# Authentication
+# Authentication Аутентификация
 
-> Auth needs to be pluggable.
+> Auth needs to be pluggable. Аутентификация должна быть подключаемой
 >
 > &mdash; Jacob Kaplan-Moss, ["REST worst practices"][cite]
 
 Authentication is the mechanism of associating an incoming request with a set of identifying credentials, such as the user the request came from, or the token that it was signed with.  The [permission] and [throttling] policies can then use those credentials to determine if the request should be permitted.
+Аутентификация это механизм ассоциации входящего запроса с набором определенных полномочий, таких как откуда пришел пользователь и запрос, или как был подписан токен. Разрешения и ограничения прав могут использовать те полномочия чтобы определить есть ли разрешение у запроса.
 
 REST framework provides a number of authentication schemes out of the box, and also allows you to implement custom schemes.
+Рест фраймворк предоставляет несколько аутенфикационных схем из коробки, и также позволяет вам использовать свои схемы.
 
 Authentication is always run at the very start of the view, before the permission and throttling checks occur, and before any other code is allowed to proceed.
+Аутентификация всегда запускается в начале view, до того как происходить проверка разрешений и ограничений, и до того как начнет выполнятся другой код.
 
 The `request.user` property will typically be set to an instance of the `contrib.auth` package's `User` class.
+Свойство `request.user` обычно установлено в экземпляре `contrib.auth` пакета `User` 
 
 The `request.auth` property is used for any additional authentication information, for example, it may be used to represent an authentication token that the request was signed with.
+Свойство `request.auth` используется для любой дополнительной аитентификационной информации, для примера, оно может использовать для предоставления аутификационного токена которым будет подписан запрос.
 
 ---
 
 **Note:** Don't forget that **authentication by itself won't allow or disallow an incoming request**, it simply identifies the credentials that the request was made with.
+**Примечание** Не забывайте, что **аутентификация сама по себе не позволяет или запрещает входящие запросы**, она просто определяет полномочия которые даны запросу.
 
 For information on how to setup the permission polices for your API please see the [permissions documentation][permission].
-
+Для информации о том как установить политику разрешений для вашего API пожалуйста смотрите [документацию разрешений][permission].
 ---
 
-## How authentication is determined
+## How authentication is determined | Как аутентификация определяется
 
 The authentication schemes are always defined as a list of classes.  REST framework will attempt to authenticate with each class in the list, and will set `request.user` and `request.auth` using the return value of the first class that successfully authenticates.
 
