@@ -36,8 +36,11 @@ When the permissions checks fail either a "403 Forbidden" or a "401 Unauthorized
 Когда проверка разрешения заканчивается "403 Forbidden" или "401 Unauthorized" ответом, в соответсвии следующим правилам:
 
 * The request was successfully authenticated, but permission was denied. *&mdash; An HTTP 403 Forbidden response will be returned.*
+* Запрос был аутентифицирован, но в разрешение откразано. *&mdash; Сервер вернет HTTP 403 Forbidden*
 * The request was not successfully authenticated, and the highest priority authentication class *does not* use `WWW-Authenticate` headers. *&mdash; An HTTP 403 Forbidden response will be returned.*
+* Запрос не аутентифицирован, и приоритетный класс аутентификации *не* использует `WWW-Authenticate` headers. *&mdash; Сервер вернет HTTP 403 Forbidden.*
 * The request was not successfully authenticated, and the highest priority authentication class *does* use `WWW-Authenticate` headers. *&mdash; An HTTP 401 Unauthorized response, with an appropriate `WWW-Authenticate` header will be returned.*
+* Запрос не аутентифицирован, и приоритетный класс аутентификации *таки* использует `WWW-Authenticate` headers. *&mdash; Сервер вернет HTTP 401 Unauthorized, с соответствиющим `WWW-Authenticate` хедером.*
 
 ## Object level permissions
 
