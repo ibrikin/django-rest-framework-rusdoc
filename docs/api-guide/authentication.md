@@ -7,19 +7,19 @@ source: authentication.py
 > &mdash; Jacob Kaplan-Moss, ["REST worst practices"][cite]
 
 Authentication is the mechanism of associating an incoming request with a set of identifying credentials, such as the user the request came from, or the token that it was signed with.  The [permission] and [throttling] policies can then use those credentials to determine if the request should be permitted.
-Аутентификация это механизм ассоциации входящего запроса с набором определенных полномочий, таких как откуда пришел пользователь и запрос, или как был подписан токен. Разрешения и ограничения прав могут использовать те полномочия чтобы определить есть ли разрешение у запроса.
+Аутентификация это механизм связывания входящего запроса с набором определенных полномочий или параметров, таких как пользователь от которого пришел запрос, или токен которым подписан этот запрос. [Разрешения][permission] и [ограничения][throttling] прав затем могут использовать эти параметры чтобы определить разрешения для запроса.
 
 REST framework provides a number of authentication schemes out of the box, and also allows you to implement custom schemes.
-Рест фраймворк предоставляет несколько аутенфикационных схем из коробки, и также позволяет вам использовать свои схемы.
+REST framework предоставляет несколько аутентификационных схем из коробки, и также позволяет вам использовать свои схемы.
 
 Authentication is always run at the very start of the view, before the permission and throttling checks occur, and before any other code is allowed to proceed.
-Аутентификация всегда запускается в начале view, до того как происходить проверка разрешений и ограничений, и до того как начнет выполнятся другой код.
+Аутентификация всегда запускается в самом начале view, до того как происходить проверка разрешений и ограничений, и до того как начнется выполняться другой код.
 
 The `request.user` property will typically be set to an instance of the `contrib.auth` package's `User` class.
-Свойство `request.user` обычно установлено в экземпляре `contrib.auth` пакета `User` 
+Свойство `request.user` обычно установлено в экземпляре `contrib.auth` класса `User` 
 
 The `request.auth` property is used for any additional authentication information, for example, it may be used to represent an authentication token that the request was signed with.
-Свойство `request.auth` используется для любой дополнительной аитентификационной информации, для примера, оно может использовать для предоставления аутификационного токена которым будет подписан запрос.
+Свойство `request.auth` используется для любой дополнительной аутентификационной информации, для примера, оно может использовать для предоставления аутификационного токена которым будет подписан запрос.
 
 ---
 
@@ -33,7 +33,7 @@ For information on how to setup the permission polices for your API please see t
 ## How authentication is determined | Как аутентификация определяется
 
 The authentication schemes are always defined as a list of classes.  REST framework will attempt to authenticate with each class in the list, and will set `request.user` and `request.auth` using the return value of the first class that successfully authenticates.
-Аутификационные схемы всегда определяются как список классов. REST fremework будет пытаться авторизоваться к каждому классу в списке, и будет устанавливать `request.user` и `request.auth` используя возвращаемое значение первого класса который успешно авторизуется.
+Аутентификационные схемы всегда определяются как список классов. REST fremework будет пытаться авторизоваться к каждому классу в списке, и установит `request.user` и `request.auth` используя возвращаемое значение первого класса который успешно авторизуется.
 
 If no class authenticates, `request.user` will be set to an instance of `django.contrib.auth.models.AnonymousUser`, and `request.auth` will be set to `None`.
 Если не один класс не авторизуется, `request.user` будет установлен в экземпляр `django.contrib.auth.models.AnonymousUser`, и `request.auth` будет установлен как `None`.
@@ -41,10 +41,10 @@ If no class authenticates, `request.user` will be set to an instance of `django.
 The value of `request.user` and `request.auth` for unauthenticated requests can be modified using the `UNAUTHENTICATED_USER` and `UNAUTHENTICATED_TOKEN` settings.
 Значение `request.user` и `request.auth` для неавторизованых запросов может быть изменено с помощью `UNAUTHENTICATED_USER` и `UNAUTHENTICATED_TOKEN` настроек.
 
-## Setting the authentication scheme | Настройки авторизационной схемы
+## Setting the authentication scheme | Настройки аутентификационной схемы
 
 The default authentication schemes may be set globally, using the `DEFAULT_AUTHENTICATION_CLASSES` setting.  For example.
-По умолчанию авторизационная схема может быть установленна глобально, в `DEFAULT_AUTHENTICATION_CLASSES` файла settings.py
+По умолчанию аутентификационная схема может быть установленна глобально, в `DEFAULT_AUTHENTICATION_CLASSES` файла settings.py
 
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -55,7 +55,7 @@ The default authentication schemes may be set globally, using the `DEFAULT_AUTHE
 
 You can also set the authentication scheme on a per-view or per-viewset basis,
 using the `APIView` class based views.
-Также вы можете установить авторизационную схему для каждого view отдельно для views наследованных от `APIView`
+Также вы можете установить аутентификационную схему для каждого view отдельно или для view наследованных от `APIView`
 
     from rest_framework.authentication import SessionAuthentication, BasicAuthentication
     from rest_framework.permissions import IsAuthenticated
@@ -86,28 +86,30 @@ Or, if you're using the `@api_view` decorator with function based views.
         }
         return Response(content)
 
-## Unauthorized and Forbidden responses | Неавторизованные и Запрещенные ответы
+## Unauthorized and Forbidden responses | 401 и 403 ответы
 
 When an unauthenticated request is denied permission there are two different error codes that may be appropriate.
-Когда неавторизованному запросу отказано в разрешение возникают две различные коды ошибки которые могут быть уместны.
+Когда неавторизованному запросу отказано в разрешение возникает два различных кода ошибки, которые могут быть уместны.
 
 * [HTTP 401 Unauthorized][http401]
 * [HTTP 403 Permission Denied][http403]
 
 HTTP 401 responses must always include a `WWW-Authenticate` header, that instructs the client how to authenticate.  HTTP 403 responses do not include the `WWW-Authenticate` header.
-Ответ HTTP 401 должен постоянно включать `WWW-Authenticate` хедер, который сообщит клиенту как авторизоваться. Ответ HTTP 403 не включает такого хедера.
+Ответ HTTP 401 должен постоянно включать хедер `WWW-Authenticate`, который сообщит клиенту как авторизоваться. Ответ HTTP 403 не включает такого хедера.
 
 The kind of response that will be used depends on the authentication scheme.  Although multiple authentication schemes may be in use, only one scheme may be used to determine the type of response.  **The first authentication class set on the view is used when determining the type of response**.
-Тип ответа зависит от авторизационной схемы. Хотя множество авторизационных схем могут быть использованы, только одна схема может быть использована чтобы определить тип ответа. **Первый авторизационный класс вьюшки используется когда определяется тип ответа**
+Тип ответа зависит от аутентификационной схемы. Хотя множество аутентификационных схем могут быть использованы, только одна схема может быть использована чтобы определить тип ответа. **Первый аутентификационный класс view используется чтобы определить тип ответа**
 
 Note that when a request may successfully authenticate, but still be denied permission to perform the request, in which case a `403 Permission Denied` response will always be used, regardless of the authentication scheme.
-Заметьте, что когда запрос может успешно аторизован, но все еще получает отказ в производстве запроса, в таком случае ответ `403 Permission Denied` несмотря на авторизационную схему.
+Заметьте, что запрос может успешно аторизоваться, но получить отказ для продолжения запроса, в таком случае будет ответ `403 Permission Denied` несмотря на аутентификационную схему.
 
-## Apache mod_wsgi specific configuration 
+## Apache mod_wsgi specific configuration Конфигурация Apache mod_wsgi
 
 Note that if deploying to [Apache using mod_wsgi][mod_wsgi_official], the authorization header is not passed through to a WSGI application by default, as it is assumed that authentication will be handled by Apache, rather than at an application level.
+Имейте в виду, если разворачиваете на Apache используя mod_wsgi, аутентификационный хедер не дойдет до WSGI приложения по умолчанию, так как предпролагается, что аутентификацию обрабатывает Apache и до уровня приложение ничего не дойдет.
 
 If you are deploying to Apache, and using any non-session based authentication, you will need to explicitly configure mod_wsgi to pass the required headers through to the application.  This can be done by specifying the `WSGIPassAuthorization` directive in the appropriate context and setting it to `'On'`.
+Если разворачиваетесь на Apache и используете любую не сессионную аутентификацию, вам нужно явно конфигурировать mod_wsgi чтобы передать необходимый хедер до приложения. Для этого определите директиву `WSGIPassAuthorization` в необходимом контексте и установите ее в положение `'On'`.
 
     # this can go in either server config, virtual host, directory or .htaccess
     WSGIPassAuthorization On
@@ -119,12 +121,12 @@ If you are deploying to Apache, and using any non-session based authentication, 
 ## BasicAuthentication | Класс BaseAuthentication
 
 This authentication scheme uses [HTTP Basic Authentication][basicauth], signed against a user's username and password.  Basic authentication is generally only appropriate for testing.
-Эта авторизационная схема использует [HTTP Basic Authentication][basicauth], подписаная паролем и именем пользователя.  Базовая авторизация в общемто подходит только для тестирования.
+Эта аутентификационная схема использует [HTTP Basic Authentication][basicauth], подписаная паролем и именем пользователя. Базовая аутентификация в общем-то подходит только для тестирования.
 
 If successfully authenticated, `BasicAuthentication` provides the following credentials.
 Если успешно авторизовался, предоставляет следующие полномочия.
 
-* `request.user` will be a Django `User` instance. будет экземплят класс User
+* `request.user` will be a Django `User` instance. будет экземпляр класса User
 * `request.auth` will be `None`. будет None
 
 Unauthenticated responses that are denied permission will result in an `HTTP 401 Unauthorized` response with an appropriate WWW-Authenticate header.  For example:
@@ -138,10 +140,10 @@ Unauthenticated responses that are denied permission will result in an `HTTP 401
 ## TokenAuthentication | Класс TokenAuthentication
 
 This authentication scheme uses a simple token-based HTTP Authentication scheme.  Token authentication is appropriate for client-server setups, such as native desktop and mobile clients.
-Эта авторизационная схема ипользует простой токен. Авторизация с помощью токена подходит для клиент-серверных установок, таких как декстопы и мобильные клиенты.
+Эта аутентификационная схема ипользует простой токен. Аутентификация с помощью токена подходит для клиент-серверных установок, таких как настольные компьютеры и мобильные клиенты.
 
 To use the `TokenAuthentication` scheme you'll need to [configure the authentication classes](#setting-the-authentication-scheme) to include `TokenAuthentication`, and additionally include `rest_framework.authtoken` in your `INSTALLED_APPS` setting:
-Чтобы использовать `TokenAuthentication` схему, вам понадобится [configure the authentication classes](#setting-the-authentication-scheme) чтобы включить `TokenAuthentication`, и дополнительно включить `rest_framework.authtoken` в ваши `INSTALLED_APPS` настройки
+Чтобы использовать `TokenAuthentication` схему, вам понадобится [сконфигурировать аутентификационные классы](#setting-the-authentication-scheme) чтобы включить `TokenAuthentication`, и дополнительно включить `rest_framework.authtoken` в ваших настройках `INSTALLED_APPS`:
 
     INSTALLED_APPS = (
         ...
@@ -151,13 +153,13 @@ To use the `TokenAuthentication` scheme you'll need to [configure the authentica
 ---
 
 **Note:** Make sure to run `manage.py syncdb` after changing your settings. The `rest_framework.authtoken` app provides both Django (from v1.7) and South database migrations. See [Schema migrations](#schema-migrations) below.
-**Примечание:** Убедитесь что запустили `manage.py syncdb` после изменений ваших настроек. `rest_framework.authtoken` предоставляет как для Django (с версии 1.7) так и South миграцию. Смотри [Schema migrations](#schema-migrations) ниже.
+**Примечание:** Убедитесь что запустили `manage.py syncdb` после изменений ваших настроек. `rest_framework.authtoken` предоставляет миграцию как для Django (с версии 1.7) так и South. Смотри [миграционные схемы](#schema-migrations) ниже.
 
 ---
 
 
 You'll also need to create tokens for your users.
-Вам нужно будет создать токен для ваших пользователей.
+Вам нужно будет создать токены для ваших пользователей.
 
     from rest_framework.authtoken.models import Token
 
@@ -165,7 +167,7 @@ You'll also need to create tokens for your users.
     print token.key
 
 For clients to authenticate, the token key should be included in the `Authorization` HTTP header.  The key should be prefixed by the string literal "Token", with whitespace separating the two strings.  For example:
-Чтобы клиентам авторизоваться, ключ токена следует включить в хедер `Authorization`. Перед ключем должен установлет префикс "Token" с пробелом
+Чтобы клиентам авторизоваться, ключ токена следует включить в хедер `Authorization`. Перед ключем необходимо установить префикс "Token" с пробелом
 
     Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 
@@ -176,7 +178,7 @@ If successfully authenticated, `TokenAuthentication` provides the following cred
 * `request.auth` will be a `rest_framework.authtoken.models.BasicToken` instance.
 
 Unauthenticated responses that are denied permission will result in an `HTTP 401 Unauthorized` response with an appropriate WWW-Authenticate header.  For example:
-Неавторизованные ответы которым отказано в разрешении будут с HTTP 401 ответом с соответсвующим хедером. Для примера:
+Неавторизованные ответы которым отказано в разрешении будут с кодом ответа HTTP 401 и хедером WWW-Authenticate. Для примера:
 
     WWW-Authenticate: Token
 
@@ -220,7 +222,7 @@ If you've already created some users, you can generate tokens for all existing u
         Token.objects.get_or_create(user=user)
 
 When using `TokenAuthentication`, you may want to provide a mechanism for clients to obtain a token given the username and password.  REST framework provides a built-in view to provide this behavior.  To use it, add the `obtain_auth_token` view to your URLconf:
-Когда используете `TokenAuthentication` вы возможно захотите предоставить механизм для клиентов получить токен по юзернайму и паролю. REST framework предоставляет встроеную вьюшку для этого. Чтобы использовать ее, добавте `obtain_auth_token` в ваш URLconf:
+Когда используете `TokenAuthentication` вы возможно захотите предоставить клиентам механизм получения токена по имени пользователя и паролю. REST framework предоставляет встроенную функцию для этого. Чтобы использовать ее, добавьте `obtain_auth_token` в ваш URLconf:
 
     from rest_framework.authtoken import views
     urlpatterns += [
@@ -228,15 +230,15 @@ When using `TokenAuthentication`, you may want to provide a mechanism for client
     ]
 
 Note that the URL part of the pattern can be whatever you want to use.
-Заметьте что URL часть паттерная который вы можете не использовать.
+Имейте в виду, что URL часть паттерная который вы можете не использовать.
 
 The `obtain_auth_token` view will return a JSON response when valid `username` and `password` fields are POSTed to the view using form data or JSON:
-`obtain_auth_token` будет возвращать JSON ответ куда отправять валидные имяпользователя и пароль в POST запросе.
+`obtain_auth_token` будет возвращать JSON ответ когда получит валидное имя пользователя и пароль в POST запросе.
 
     { 'token' : '9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' }
 
 Note that the default `obtain_auth_token` view explicitly uses JSON requests and responses, rather than using default renderer and parser classes in your settings.  If you need a customized version of the `obtain_auth_token` view, you can do so by overriding the `ObtainAuthToken` view class, and using that in your url conf instead.
-Заметьте что по умолчанию `obtain_auth_token` явно используют JSON запросы и ответы, вместо использования по умолчанию визуализации и парсинга классов в ваших настройках. Если вам нужна своя версия `obtain_auth_token`, вы можете переопределить `ObtainAuthToken` класс и использовать его в ваших url.
+Имейте в виду, что по умолчанию `obtain_auth_token` явно использует JSON запросы и ответы, вместо использования по умолчанию визуализации и парсинга классов в ваших настройках. Если вам нужна своя версия `obtain_auth_token`, вы можете переопределить `ObtainAuthToken` класс и использовать его в ваших конфигурация url.
 
 #### Schema migrations | Схема миграции
 
@@ -255,7 +257,7 @@ If you're using a [custom user model][custom-user-model] you'll need to make sur
 Если вы используете [свою модель пользователей][custom-user-model] вам нужно будет убедиться, что каждая новая миграция которая создает таблицу с пользователями запускается до создания таблицы с токенами.
 
 You can do so by inserting a `needed_by` attribute in your user migration:
-Для этого вы можете вставить атребут `needed_by` внутрь вашей миграции:
+Для этого вы можете вставить атрибут `needed_by` внутрь вашей миграции:
 
     class Migration:
 
@@ -279,16 +281,16 @@ Also note that if you're using a `post_save` signal to create tokens, then the f
 ## SessionAuthentication | Класс SessionAuthentication
 
 This authentication scheme uses Django's default session backend for authentication.  Session authentication is appropriate for AJAX clients that are running in the same session context as your website.
-Такая авторизационная схема используется Джанго по умолчанию. Авторизация сессиями подходит для AJAX клиентов которые запускают одинаковый сессионный контекст как ваш сайт
+Такая аутентификационная схема используется Джанго по умолчанию. Авторизация сессиями подходит для AJAX клиентов которые запускают одинаковый сессионный контекст как ваш сайт
 
 If successfully authenticated, `SessionAuthentication` provides the following credentials.
-Если успешно авторизоваться, предоставляются следующие полномочия:
+Если успешно авторизовался, предоставляются следующие полномочия:
 
 * `request.user` will be a Django `User` instance. будет экземпляр Django User
 * `request.auth` will be `None`. будет None
 
 Unauthenticated responses that are denied permission will result in an `HTTP 403 Forbidden` response.
-Неавторизованные ответы которым был отказано в разрешение будут возвращаться с ответом `HTTP 403 Forbidden`.
+Неавторизованные ответы которым было отказано в разрешение будут возвращаться с ответом `HTTP 403 Forbidden`.
 
 If you're using an AJAX style API with SessionAuthentication, you'll need to make sure you include a valid CSRF token for any "unsafe" HTTP method calls, such as `PUT`, `PATCH`, `POST` or `DELETE` requests.  See the [Django CSRF documentation][csrf-ajax] for more details.
 Если вы используете AJAX стиль с SessionAuthentucation, вам нужно будет убедиться что CSRF токен включен для любого "не безопасного" HTTP метода, такого как `PUT`, `PATH`, `POST` или `DELETE`. Смотрите [CSRF Django документацию][csrf-ajax] для подробностей.
@@ -297,29 +299,29 @@ If you're using an AJAX style API with SessionAuthentication, you'll need to mak
 **Внимание**: Всегда используйте стандартный Джанго логин когда создаете страницу с логином. Это защитит вас.
 
 CSRF validation in REST framework works slightly differently to standard Django due to the need to support both session and non-session based authentication to the same views. This means that only authenticated requests require CSRF tokens, and anonymous requests may be sent without CSRF tokens. This behaviour is not suitable for login views, which should always have CSRF validation applied.
-CSRF валидация в REST работает немного по другому чем в Джанго, по причине необходимости поддержки как сессионного так и несессионного метода авторизации в одной вьюшке. Это значит, что только авторизационный запрос требудет CSRF токен, и анонимные запросы могут быть отправилены без CSRF токена. Это поведение не соответсвует логин вьюшке, которое должно всегда иметь CSRF.
+CSRF валидация в REST framework работает немного по другому чем в Джанго, по причине необходимости поддержки как сессионного так и несессионного метода авторизации в одной view. Это значит, что только аутентификационный запрос требудет CSRF токен, и анонимные запросы могут быть отправилены без CSRF токена. Это поведение не соответсвует логин view, которая должно всегда иметь CSRF.
 
-# Custom authentication | Кастомные авторизации
+# Custom authentication | Кастомные аутентификации
 
 To implement a custom authentication scheme, subclass `BaseAuthentication` and override the `.authenticate(self, request)` method.  The method should return a two-tuple of `(user, auth)` if authentication succeeds, or `None` otherwise.
-Чтобы осуществить кастомную авторизации, нужно наследоваться от `BaseAuthentication` и переопределить  метод `.authenticate(self, request)` . Метод должен возвращать тюпла вида `(user, auth)` если авторизация успешна, или `None`.
+Чтобы осуществить кастомную аутентификацию, нужно наследоваться от `BaseAuthentication` и переопределить  метод `.authenticate(self, request)` . Метод должен возвращать кортеж вида `(user, auth)` если авторизация успешна, или `None`.
 
 In some circumstances instead of returning `None`, you may want to raise an `AuthenticationFailed` exception from the `.authenticate()` method.
 В некоторых обстоятельствах вместо возвращения `None`, вы можете получить исключение `AuthenticationFailed` из метода `.authenticate()` .
 
 Typically the approach you should take is:
-Обычно вас следует придерживаться следующих подходов:
+Обычно вам следует придерживаться следующих подходов:
 
 * If authentication is not attempted, return `None`.  Any other authentication schemes also in use will still be checked.
-* Если авторизация не пробовалась, вернет `None`. Любые другие авторизационные схемы также будут проверсятбся.
+* Если аутентификация не случилась, вернет `None`. Любые другие аутентификационные схемы также будут проверяться.
 * If authentication is attempted but fails, raise a `AuthenticationFailed` exception.  An error response will be returned immediately, regardless of any permissions checks, and without checking any other authentication schemes.
-* Если авторизация пробовалась но провалилась, сработает исключение `AuthenticationFailed`. Ошибочный ответ будет возвращен немедленно, несмотря на любые проверки разрешений, и без проверки любых других авторизационных схем.
+* Если авторизация случилась но провалилась, сработает исключение `AuthenticationFailed`. Ошибочный ответ будет возвращен немедленно, несмотря на любые проверки разрешений, и без проверки любых других авторизационных схем.
 
 You *may* also override the `.authenticate_header(self, request)` method.  If implemented, it should return a string that will be used as the value of the `WWW-Authenticate` header in a `HTTP 401 Unauthorized` response.
 Вы *можете* также переопределить метод `.authenticate_header(self, request)`. Если он есть, он должен вернуть строку которая будет использоваться как значение хедера `WWW-Authenticate` в ответе `HTTP 401 Unauthorized`.
 
 If the `.authenticate_header()` method is not overridden, the authentication scheme will return `HTTP 403 Forbidden` responses when an unauthenticated request is denied access.
-Если метод `.authenticate_header()` не переопределен, авторизационная схема будет возвращать `HTTP 403 Forbidden` когда неавторизованному запросу откжут в доступе.
+Если метод `.authenticate_header()` не переопределен, аутентификационная схема будет возвращать `HTTP 403 Forbidden` когда неавторизованному запросу откажут в доступе.
 
 ## Example | Пример
 
@@ -408,27 +410,27 @@ The [Django OAuth2 Consumer][doac] library from [Rediker Software][rediker] is a
 ## JSON Web Token Authentication
 
 JSON Web Token is a fairly new standard which can be used for token-based authentication. Unlike the built-in TokenAuthentication scheme, JWT Authentication doesn't need to use a database to validate a token. [Blimp][blimp] maintains the [djangorestframework-jwt][djangorestframework-jwt] package which provides a JWT Authentication class as well as a mechanism for clients to obtain a JWT given the username and password.
-JWT - относительно новый стандарт который может быть использован для токен авторизации. В отличии от встроенной токен схемы, JWT авторизации не нужна база данных для валидации токена. Разработкой и поддержкой занимается [Blimp][blimp] с пакетом [djangorestframework-jwt][djangorestframework-jwt] который предоставляет JWT Authentication класс как механизм для клиентов чтобы получать JWT по имени пользователя и паролю.
+JWT - относительно новый стандарт который может быть использован для токен авторизации. В отличии от встроенной токен схемы, JWT авторизации не нужна база данных для валидации токена. Разработкой и поддержкой занимается [Blimp][blimp] с пакетом [djangorestframework-jwt][djangorestframework-jwt] который предоставляет JWT Authentication класс как механизм получения JWT токена по имени пользователя и паролю.
 
 ## Hawk HTTP Authentication
 
 The [HawkREST][hawkrest] library builds on the [Mohawk][mohawk] library to let you work with [Hawk][hawk] signed requests and responses in your API. [Hawk][hawk] lets two parties securely communicate with each other using messages signed by a shared key. It is based on [HTTP MAC access authentication][mac] (which was based on parts of [OAuth 1.0][oauth-1.0a]).
-Библиотека [HawkREST][hawkrest] построена на библиотеке [Mohawk][mohawk] позволя вам работать с [Hawk][hawk] подписывая запросу и ответы вашего API. [Hawk][hawk] позволяет двум частям безопасно комуницировать с друг другом используя подписи с общим ключем. Это базируется на [HTTP MAC access authentication][mac] (который базируется от части на [OAuth 1.0][oauth-1.0a]).
+Библиотека [HawkREST][hawkrest] построена на библиотеке [Mohawk][mohawk] позволяет вам работать с [Hawk][hawk] подписывая запросу и ответы вашего API. [Hawk][hawk] позволяет двум частям безопасно комуницировать с друг другом используя подписи с общим ключем. Это базируется на [HTTP MAC access authentication][mac] (который базируется от части на [OAuth 1.0][oauth-1.0a]).
 
 ## HTTP Signature Authentication 
 
 HTTP Signature (currently a [IETF draft][http-signature-ietf-draft]) provides a way to achieve origin authentication and message integrity for HTTP messages. Similar to [Amazon's HTTP Signature scheme][amazon-http-signature], used by many of its services, it permits stateless, per-request authentication. [Elvio Toccalino][etoccalino] maintains the [djangorestframework-httpsignature][djangorestframework-httpsignature] package which provides an easy to use HTTP Signature Authentication mechanism.
-Подпись HTTP (сейчас [IETF draft][http-signature-ietf-draft]) предоставляет способ достижения первоначальной авторизации и интеграцию сообщейний для HTTP сообщений. Подобно [Amazon's HTTP Signature scheme][amazon-http-signature], используетмя во многих своих сервисах, это разрешение без гражданства, для каждого запроса авторизации. [Elvio Toccalino][etoccalino] поддерживает  пакет [djangorestframework-httpsignature][djangorestframework-httpsignature] для простого использования механизма HTTP подписи. 
+Подпись HTTP (сейчас [IETF draft][http-signature-ietf-draft]) предоставляет способ достижения первоначальной авторизации и интеграцию сообщейний для HTTP сообщений. Подобно [Amazon's HTTP Signature scheme][amazon-http-signature], используется во многих своих сервисах, это разрешение без гражданства, для каждого запроса авторизации. [Elvio Toccalino][etoccalino] поддерживает  пакет [djangorestframework-httpsignature][djangorestframework-httpsignature] для простого использования механизма HTTP подписи. 
 
 ## Djoser 
 
 [Djoser][djoser] library provides a set of views to handle basic actions such as registration, login, logout, password reset and account activation. The package works with a custom user model and it uses token based authentication. This is a ready to use REST implementation of Django authentication system.
-Библиотека [Djoser][djoser] предоставляет набор вьюшек для обработки базовых действий таких как регистрация, логирование, выход из системы, сброс пароля и активация аккаунта. Паке работает с моделями кастомных пользователй и использует авторизацию основаную на токенах. Она готова использовать REST авторизационной системы Джанго.
+Библиотека [Djoser][djoser] предоставляет набор view для обработки базовых действий таких как регистрация, логирование, выход из системы, сброс пароля и активация аккаунта. Пакет работает с моделями кастомных пользователей и использует авторизацию основаную на токенах. Использует REST авторизационной системы Джанго.
 
 ## django-rest-auth
 
 [Django-rest-auth][django-rest-auth] library provides a set of REST API endpoints for registration, authentication (including social media authentication), password reset, retrieve and update user details, etc. By having these API endpoints, your client apps such as AngularJS, iOS, Android, and others can communicate to your Django backend site independently via REST APIs for user management. 
-Библиотека [Django-rest-auth][django-rest-auth] предоставляет набор инструментов для REST API: регистрация, авторизация (включая авторизацию через социальные сети), сброс пароля, получение и обновление пользовательских деталей и тд. С этими инструментами, ваше клиентское приложение как AngularJS, iOS, Android и другие смогут взаимодействовать с Джанго бэкендом независимо по средством REST APIs. 
+Библиотека [Django-rest-auth][django-rest-auth] предоставляет набор инструментов для REST API: регистрация, авторизация (включая авторизацию через социальные сети), сброс пароля, получение и обновление пользовательских деталей и тд. С этими инструментами, ваше клиентское приложение как AngularJS, iOS, Android и другие смогут взаимодействовать с Джанго бэкендом независимо посредством REST API. 
 
 [cite]: http://jacobian.org/writing/rest-worst-practices/
 [http401]: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
