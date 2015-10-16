@@ -5,13 +5,17 @@ source: mixins.py
 
 > Django’s generic views... were developed as a shortcut for common usage patterns... They take certain common idioms and patterns found in view development and abstract them so that you can quickly write common views of data without having to repeat yourself.
 >
+> Django’s generic views... были разработаны как быстрый метод использования общих паттернов... Они содержали определенные общие идиомы и паттерны которые можно найти в разработке view так, что вы можете быстро написать общий view данных без повторений.
 > &mdash; [Django Documentation][cite]
 
 One of the key benefits of class based views is the way they allow you to compose bits of reusable behavior.  REST framework takes advantage of this by providing a number of pre-built views that provide for commonly used patterns.
+Один из ключевых плюсов view основанных на классах - это то, что они позволяют собрать кусочки повторноиспользуемого поведения вместе. REST framework использует это предоставляя уже созданные view которые дают общеиспользуемые паттерны.
 
 The generic views provided by REST framework allow you to quickly build API views that map closely to your database models.
+Общие view предоставленые REST fremework позволяют вам быстро создать API view которое близко покроет вашу модель в базе данных.
 
 If the generic views don't suit the needs of your API, you can drop down to using the regular `APIView` class, or reuse the mixins and base classes used by the generic views to compose your own set of reusable generic views.
+Если обобщенный view не соответствует вашим потребностям в API, вы можете использовать обычный класс `APIView` или использовать примиси и базовые классы используемые обобщенными views чтобы собрать ваш собственный набор обобщенных view.
 
 ## Examples
 

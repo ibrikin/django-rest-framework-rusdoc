@@ -3,17 +3,21 @@ source: viewsets.py
 # ViewSets
 
 > After routing has determined which controller to use for a request, your controller is responsible for making sense of the request and producing the appropriate output.
->
+> После того как роутинг определился с контроллером для запроса, ваш контроллер ответственен за запрос и за произдводство соответсвующего вывода.
 > &mdash; [Ruby on Rails Documentation][cite]
 
 
 Django REST framework allows you to combine the logic for a set of related views in a single class, called a `ViewSet`.  In other frameworks you may also find conceptually similar implementations named something like 'Resources' or 'Controllers'.
+Django REST framework позволяет вам комбинировать логику для набора связанных view в одном классе - `ViewSet`. В других фреймворках вы возможно найдете похожие реализации классов названые как-то типа `Resourses` или `Controllers`.
 
 A `ViewSet` class is simply **a type of class-based View, that does not provide any method handlers** such as `.get()` or `.post()`, and instead provides actions such as `.list()` and `.create()`.
+Класс `ViewSet` является **основанным на классах view, которые не предоставляет никаких методов обработчиков** таких как `.get()` или `.post()`, а предоставляет такие действия как `.list()` и `.create()`.
 
 The method handlers for a `ViewSet` are only bound to the corresponding actions at the point of finalizing the view, using the `.as_view()` method.
+Обработчики методов для `ViewSet` являются только связью для соответсвующтй действий в конце view, используя метод `.as_view()`.
 
 Typically, rather than explicitly registering the views in a viewset in the urlconf, you'll register the viewset with a router class, that automatically determines the urlconf for you.
+Обычно, вместо явной регистрации views в наборе и конфиге url, вы зарегестрируете набор veiw в классе маршрутизации, который автоматически определит конфигурацию url для вас.
 
 ## Example
 

@@ -9,6 +9,7 @@ sending more complex data than simple forms
 > &mdash; Malcom Tredinnick, [Django developers group][cite]
 
 REST framework includes a number of built in Parser classes, that allow you to accept requests with various media types.  There is also support for defining your own custom parsers, which gives you the flexibility to design the media types that your API accepts.
+REST framework включает несколько встроенных парсер классов, что позволяет вам принимать запросы с многообразием типов медиа. Также он поддерживает определение ваших собственных парсеров, которые дадут вам гибкость в конструировании типов медия которые будет принимать ваш API.
 
 ## How the parser is determined
 
