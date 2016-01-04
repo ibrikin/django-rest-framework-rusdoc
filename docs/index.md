@@ -12,10 +12,8 @@
 
 ---
 
-**Note**: This is the documentation for the **version 3.2** of REST framework. Documentation for [version 2.4](http://tomchristie.github.io/rest-framework-2-docs/) is also available.
 **Примечание**: Это документация для версии **3.2**. Документация для [version 2.4](http://tomchristie.github.io/rest-framework-2-docs/) также доступна.
 
-For more details see the 3.2 [announcement][3.2-announcement] and [release notes][release-notes].
 Для более подробной информации смотрите 3.2 [Последние изменения][3.2-announcement] и [примечания к выпуску][release-notes].
 
 ---
@@ -33,62 +31,49 @@ For more details see the 3.2 [announcement][3.2-announcement] and [release notes
 <img alt="Django REST Framework" title="Logo by Jake 'Sid' Smith" src="img/logo.png" width="600px" style="display: block; margin: 0 auto 0 auto">
 </p>
 
-Django REST framework is a powerful and flexible toolkit that makes it easy to build Web APIs.
 Django REST framework - мощный и гибкий инструмент для создания  Web APIs.
 
-Some reasons you might want to use REST framework:
 Некоторые причины из-за которых вы захотите использовать REST framework:
 
-* The [Web browsable API][sandbox] is a huge usability win for your developers.
 * [Web-интерфейс для API][sandbox] - удобство для ваших разработчиком.
-* [Authentication policies][authentication] including packages for [OAuth1a][oauth1-section] and [OAuth2][oauth2-section].
 * [Авторизация][authentication] включает пакеты для [OAuth1a][oauth1-section] и [OAuth2][oauth2-section].
-* [Serialization][serializers] that supports both [ORM][modelserializer-section] and [non-ORM][serializer-section] data sources.
 * [Сериализация][serializers] поддерживает как [ORM][modelserializer-section] так и [non-ORM][serializer-section] источники.
 * Customizable all the way down - just use [regular function-based views][functionview-section] if you don't need the [more][generic-views] [powerful][viewsets] [features][routers].
-* Настраивается все - just use [regular function-based views][functionview-section] if you don't need the [more][generic-views] [powerful][viewsets] [features][routers].
-* [Extensive documentation][index], and [great community support][group].
+* Настраивается все - просто используйте [regular function-based views][functionview-section] если нет необходимости в [более][generic-views] [мощных][viewsets] [инструментах][routers].
 * [Обширная документация][index], и [отличное сообщество поддержки][group].
-* Used and trusted by large companies such as [Mozilla][mozilla] and [Eventbrite][eventbrite].
 * Используют и доверяют в больших компаниях как [Mozilla][mozilla] и [Eventbrite][eventbrite].
 
 ---
 
 ![Screenshot][image]
 
-**Above**: *Screenshot from the browsable API*
 **Выше**: *Скриншот Web-интерфейса для API*
 
-## Requirements | Требования
+## Требования
 
-REST framework requires the following:
 REST framework требует следующее:
 
 * Python (2.6.5+, 2.7, 3.2, 3.3, 3.4)
 * Django (1.5.6+, 1.6.3+, 1.7+, 1.8)
 
-The following packages are optional:
 Следующие пакеты и модули опционально:
 
 * [Markdown][markdown] (2.1.0+) - Markdown support for the browsable API.
 * [django-filter][django-filter] (0.9.2+) - Filtering support.
 * [django-guardian][django-guardian] (1.1.1+) - Object level permissions support.
 
-## Installation | Установка
+## Установка
 
-Install using `pip`, including any optional packages you want...
 Устанавить используюя `pip`, включая любые модули и пакеты по желанию...
 
     pip install djangorestframework
     pip install markdown       # Markdown support for the browsable API.
     pip install django-filter  # Filtering support
 
-...or clone the project from github.
 ...или клонируй из github.
 
     git clone git@github.com:tomchristie/django-rest-framework.git
 
-Add `'rest_framework'` to your `INSTALLED_APPS` setting.
 Добавь `'rest_framework'` в свои `INSTALLED_APPS` настройки setting.py
 
     INSTALLED_APPS = (
@@ -96,7 +81,6 @@ Add `'rest_framework'` to your `INSTALLED_APPS` setting.
         'rest_framework',
     )
 
-If you're intending to use the browsable API you'll probably also want to add REST framework's login and logout views.  Add the following to your root `urls.py` file.
 Если вы планируете использовать Web-интерфейс, то возможно вы захотите добавить login и logout views.  Добавьте следующее к вашему корневому `urls.py`
 
     urlpatterns = [
@@ -104,18 +88,15 @@ If you're intending to use the browsable API you'll probably also want to add RE
         url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     ]
 
-Note that the URL path can be whatever you want, but you must include `'rest_framework.urls'` with the `'rest_framework'` namespace.
 Заметьте, что URL путь может быть каким вы хотите, но вы должны включить `'rest_framework.urls'` с `'rest_framework'` пространством имен.
 
-## Example | Пример
+## Пример
 
-Let's take a look at a quick example of using REST framework to build a simple model-backed API.
 Давайте рассмотрим быстрый пример использования REST framework для построения простого API.
 
-We'll create a read-write API for accessing information on the users of our project.
 Мы создадим API с возможностью чтения-записи для доступа к информации о пользователях нашего проекта.
 
-Any global settings for a REST framework API are kept in a single configuration dictionary named `REST_FRAMEWORK`.  Start off by adding the following to your `settings.py` module:
+Любая глобальная настройка для REST framework помещаетя в простой конфигурационный словарь `REST_FRAMEWORK`. Начните с добавления следующего в ваш `settings.py` модуль:
 
     REST_FRAMEWORK = {
         # Use Django's standard `django.contrib.auth` permissions,
@@ -125,10 +106,10 @@ Any global settings for a REST framework API are kept in a single configuration 
         ]
     }
 
-Don't forget to make sure you've also added `rest_framework` to your `INSTALLED_APPS`.
+Не забудте убедиться что уже добавлен `rest_framework` в `INSTALLED_APPS`.
 
-We're ready to create our API now.
-Here's our project's root `urls.py` module:
+Мы готовы к созданию нашего API.
+Это наш корневой `urls.py` модуль:
 
     from django.conf.urls import url, include
     from django.contrib.auth.models import User
@@ -156,15 +137,15 @@ Here's our project's root `urls.py` module:
         url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     ]
 
-You can now open the API in your browser at [http://127.0.0.1:8000/](http://127.0.0.1:8000/), and view your new 'users' API. If you use the login control in the top right corner you'll also be able to add, create and delete users from the system.
+Теперь вы можете открыть ваше API в браузере [http://127.0.0.1:8000/](http://127.0.0.1:8000/), и посмотреть ваше новое 'users' API. Если вы используете логин, то в верхнем правом углу вы сможете добавить, создать и удалить пользователя из системы.
 
-## Quickstart
+## Быстрый старт
 
-Can't wait to get started? The [quickstart guide][quickstart] is the fastest way to get up and running, and building APIs with REST framework.
+Нетерпится начать? [Быстрый старт][quickstart] самый быстрый способ начать строить API с REST framework.
 
 ## Tutorial
 
-The tutorial will walk you through the building blocks that make up REST framework.   It'll take a little while to get through, but it'll give you a comprehensive understanding of how everything fits together, and is highly recommended reading.
+Руководство проведет вас через строительные блоки из которых состоит REST framework. Это займет некоторое время, но даст вас всеобъемлющее понимание работы фреймворка. Рекомендуется к прочтению.
 
 * [1 - Serialization][tut-1]
 * [2 - Requests & Responses][tut-2]
@@ -173,11 +154,12 @@ The tutorial will walk you through the building blocks that make up REST framewo
 * [5 - Relationships & hyperlinked APIs][tut-5]
 * [6 - Viewsets & routers][tut-6]
 
-There is a live example API of the finished tutorial API for testing purposes, [available here][sandbox].
 
-## API Guide
+Живой пример API завершенный в руководстве для тестовых целей можно найти [тут][sandbox].
 
-The API guide is your complete reference manual to all the functionality provided by REST framework.
+## Руководство по API
+
+Руководство по API это полный справочный мануал для всей функциональности.
 
 * [Requests][request]
 * [Responses][response]
@@ -206,7 +188,7 @@ The API guide is your complete reference manual to all the functionality provide
 * [Testing][testing]
 * [Settings][settings]
 
-## Topics
+## Темы
 
 General guides to using REST framework.
 
@@ -224,13 +206,13 @@ General guides to using REST framework.
 * [Kickstarter Announcement][kickstarter-announcement]
 * [Release Notes][release-notes]
 
-## Development
+## Разработка
 
 See the [Contribution guidelines][contributing] for information on how to clone
 the repository, run the test suite and contribute changes back to REST
 Framework.
 
-## Support
+## Поддержка
 
 For support please see the [REST framework discussion group][group], try the  `#restframework` channel on `irc.freenode.net`, search [the IRC archives][botbot], or raise a  question on [Stack Overflow][stack-overflow], making sure to include the ['django-rest-framework'][django-rest-framework-tag] tag.
 
@@ -241,13 +223,13 @@ For updates on REST framework development, you may also want to follow [the auth
 <a style="padding-top: 10px" href="https://twitter.com/_tomchristie" class="twitter-follow-button" data-show-count="false">Follow @_tomchristie</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
-## Security
+## Безопасность
 
 If you believe you’ve found something in Django REST framework which has security implications, please **do not raise the issue in a public forum**.
 
 Send a description of the issue via email to [rest-framework-security@googlegroups.com][security-mail].  The project maintainers will then work with you to resolve any issues where required, prior to any public disclosure.
 
-## License
+## Лицензия
 
 Copyright (c) 2011-2015, Tom Christie
 All rights reserved.
