@@ -7,6 +7,7 @@ source: fields.py
 > &mdash; [Django documentation][cite]
 
 Serializer fields handle converting between primitive values and internal datatypes.  They also deal with validating input values, as well as retrieving and setting the values from their parent objects.
+Поля сериализатора регулируют конвертациюей между примитивными значениями и внетренними типами данных. Они также работают с валидацией введенных значений, а также получением и установкой значений от своих родительских объектов.
 
 ---
 

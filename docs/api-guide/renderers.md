@@ -7,6 +7,7 @@ source: renderers.py
 > &mdash; [Django documentation][cite]
 
 REST framework includes a number of built in Renderer classes, that allow you to return responses with various media types.  There is also support for defining your own custom renderers, which gives you the flexibility to design your own media types.
+REST framework включает несколько встроенных Renderer классов, которые позволяют вас возвращать ответы с разнообразным типом медиа. Также вы можете определить ваш собственный класс, который даст вам гибкость в конструировании собственных типов медиа.
 
 ## How the renderer is determined
 

@@ -45,14 +45,19 @@ When the permissions checks fail either a "403 Forbidden" or a "401 Unauthorized
 ## Object level permissions
 
 REST framework permissions also support object-level permissioning.  Object level permissions are used to determine if a user should be allowed to act on a particular object, which will typically be a model instance.
+Разрешения REST framework также поддерживает объектноуровневое разрешение. Объектно уровневое разрешение определяет следует ли дать разрешение действовать над определенным объектом, который будет обычно моделью экземпляра.
 
 Object level permissions are run by REST framework's generic views when `.get_object()` is called.
 As with view level permissions, an `exceptions.PermissionDenied` exception will be raised if the user is not allowed to act on the given object.
+Объектно уровневое разрешение запускается обобщенным REST framework view когда вызывается `.get_object()`.
+Так view c уровнем разрешения, получет исключение `exceptions.PermissionDenied` если пользователю не позволено производить действия над объектом.
 
 If you're writing your own views and want to enforce object level permissions,
 or if you override the `get_object` method on a generic view, then you'll need to explicitly call the `.check_object_permissions(request, obj)` method on the view at the point at which you've retrieved the object.
+Если вы написали свое view и хотите соблюсти объектно уровневое разрешение, или вы переопределили метод `get_object`, догда вам надо явно вызвать метод `.check_object_permissions(request, obj)` в месте в котором вы получаете объект.
 
 This will either raise a `PermissionDenied` or `NotAuthenticated` exception, or simply return if the view has the appropriate permissions.
+Это вызовет исключения `PermissionDenied` или `NotAuthenticated` при отсутствии разрешения, или вернет объект при наличие соответсвующего разрешения.
 
 For example:
 
@@ -61,15 +66,18 @@ For example:
         self.check_object_permissions(self.request, obj)
         return obj
 
-#### Limitations of object level permissions
+#### Limitations of object level permissions | Ограничения объектно уровневых разрешений
 
 For performance reasons the generic views will not automatically apply object level permissions to each instance in a queryset when returning a list of objects.
+По причинам производительности обобщенный view не будет автоматически заполнять объектно уровневые разрешения для каждого экземпляра в запросе, когда возвращает список объектов.
 
 Often when you're using object level permissions you'll also want to [filter the queryset][filtering] appropriately, to ensure that users only have visibility onto instances that they are permitted to view.
+Часто когда вы используете объектно уровневое разрешения, вы также захотите [отфильтровать запросы][filtering] соответсвенно, чтобы убедиться, что пользователи видят только то, что им разрешено.
 
-## Setting the permission policy
+## Setting the permission policy | Установки разрешающих прав
 
 The default permission policy may be set globally, using the `DEFAULT_PERMISSION_CLASSES` setting.  For example.
+По умолчанию права разрешений могут быть установлены глобально, используя `DEFAULT_PERMISSION_CLASSES` в файле settings.py. Для примера:
 
     REST_FRAMEWORK = {
         'DEFAULT_PERMISSION_CLASSES': (
@@ -78,6 +86,7 @@ The default permission policy may be set globally, using the `DEFAULT_PERMISSION
     }
 
 If not specified, this setting defaults to allowing unrestricted access:
+Если не определены, то по умолчанию стоят не строгие права:
 
     'DEFAULT_PERMISSION_CLASSES': (
        'rest_framework.permissions.AllowAny',
@@ -85,6 +94,7 @@ If not specified, this setting defaults to allowing unrestricted access:
 
 You can also set the authentication policy on a per-view, or per-viewset basis,
 using the `APIView` class based views.
+Вы также можете установить авторизационные права для каждого view, используя классс `APIView`
 
     from rest_framework.permissions import IsAuthenticated
     from rest_framework.response import Response
@@ -100,6 +110,7 @@ using the `APIView` class based views.
             return Response(content)
 
 Or, if you're using the `@api_view` decorator with function based views.
+Или если вы используете декоратор `@api_view`
 
     from rest_framework.decorators import api_view, permission_classes
     from rest_framework.permissions import IsAuthenticated
@@ -115,86 +126,112 @@ Or, if you're using the `@api_view` decorator with function based views.
 
 ---
 
-# API Reference
+# API Reference | Справочник API
 
 ## AllowAny
 
 The `AllowAny` permission class will allow unrestricted access, **regardless of if the request was authenticated or unauthenticated**.
+Класс `AllowAny` разрешает не строгий доступ, **не важно, был запрос авторизован или нет**.
 
 This permission is not strictly required, since you can achieve the same result by using an empty list or tuple for the permissions setting, but you may find it useful to specify this class because it makes the intention explicit.
+Это разрешение не обязательно, вы можете добиться таких же результатов используя пустой список или кортеж для настроек разрешений, но вы можете найти это полезным в явном назначении.
 
 ## IsAuthenticated
 
 The `IsAuthenticated` permission class will deny permission to any unauthenticated user, and allow permission otherwise.
+Класс `IsAuthenticated` будет отказывать в доступе любому не авторизованому пользователю, и разрешать в обратной ситуации.
 
 This permission is suitable if you want your API to only be accessible to registered users.
+Этот вид разрешения подходит если вы хотите чтобы ваш API  был доступен для зарегестрированных пользователей.
 
 ## IsAdminUser
 
 The `IsAdminUser` permission class will deny permission to any user, unless `user.is_staff` is `True` in which case permission will be allowed.
+Класс `IsAdminUser`будет отказывать в доступе любому пользователю, кроме тех у которых `user.is_staff` - `True`.
 
 This permission is suitable if you want your API to only be accessible to a subset of trusted administrators.
+Этот вид разрешения подходит если вы хотите чтобы ваш API был доступен только доверенным администраторам.
 
 ## IsAuthenticatedOrReadOnly
 
 The `IsAuthenticatedOrReadOnly` will allow authenticated users to perform any request.  Requests for unauthorised users will only be permitted if the request method is one of the "safe" methods; `GET`, `HEAD` or `OPTIONS`.
+Класс `IsAuthenticatedOrReadOnly` будет разрешать любые запросы для авторизованных пользователей. Запросы для не авторизованных пользователей будут только разрешены для методов `GET`, `HEAD`, или `OPTIONS`.
 
 This permission is suitable if you want to your API to allow read permissions to anonymous users, and only allow write permissions to authenticated users.
+Этот вид разрешения подходит если вы хотите предоставить достпук на чтение для анонимных пользователей и доступ на запись только для авторизованных пользователей.
 
 ## DjangoModelPermissions
 
 This permission class ties into Django's standard `django.contrib.auth` [model permissions][contribauth].  This permission must only be applied to views that has a `.queryset` property set. Authorization will only be granted if the user *is authenticated* and has the *relevant model permissions* assigned.
+Этот разрешающий класс связан со стандартным модулем Джанго `django.contrib.auth` [model permissions][contribauth]. Этот тип рахрешения может быть использованя для view которым установлен свойство `.queryset`. Авторизация произойдет только если пользователь *авторизован* и обладает соответсвующим *разрешением*.
 
 * `POST` requests require the user to have the `add` permission on the model.
+* Запрос `POST` требует чтобы пользователь имел `дополнительное` разрешение в моделе. 
 * `PUT` and `PATCH` requests require the user to have the `change` permission on the model.
+* `PUT` и `PATCH` требуют чтобы пользователь имел разрешение `change` в моделе.
 * `DELETE` requests require the user to have the `delete` permission on the model.
+* Запрос `DELETE` требует чтобы пользователь имел разрешение `delete` в моделе.
 
 The default behaviour can also be overridden to support custom model permissions.  For example, you might want to include a `view` model permission for `GET` requests.
+Поведение может быть переопределенно чтобы поддерживать собственную модель разрешения. Для примера, вы может захотите включить `view` модель разрешения для `GET` запроса.
 
 To use custom model permissions, override `DjangoModelPermissions` and set the `.perms_map` property.  Refer to the source code for details.
+Чтобы использовать свою модель разрешений, переопределите `DjangoModelPermissions` и установите свойство `.perms_map`. Обратитесь к исходному коду для деталей.
 
-#### Using with views that do not include a `queryset` attribute.
+#### Using with views that do not include a `queryset` attribute. Использование с view которые не включают атрибут `queryset`.
 
 If you're using this permission with a view that uses an overridden `get_queryset()` method there may not be a `queryset` attribute on the view. In this case we suggest also marking the view with a sential queryset, so that this class can determine the required permissions. For example:
+Если вы использует такое разрешениу с view которое использует переопределенный метод `get_queryset()` может не быть атрибута `queryset`. В этом случае мы предлагаем также отмечать это view с queryset, таким образом класс может определить требуемое разрешение. Для примера:
 
     queryset = User.objects.none()  # Required for DjangoModelPermissions
 
 ## DjangoModelPermissionsOrAnonReadOnly
 
 Similar to `DjangoModelPermissions`, but also allows unauthenticated users to have read-only access to the API.
+Подобно `DjangoModelPermissions`, но позволяет неавторизованным пользователям иметь доступ только к чтению API.
 
 ## DjangoObjectPermissions
 
 This permission class ties into Django's standard [object permissions framework][objectpermissions] that allows per-object permissions on models.  In order to use this permission class, you'll also need to add a permission backend that supports object-level permissions, such as [django-guardian][guardian].
+Этот класс связан со стандартным Джанго [разрешением][objectpermissions] который позволяет пообъектное разрешение в моделе. В порядке использования этого класса, нам нужно добавить поддержку объектноориентированного разрешения, как [django-guardian][guardian].
 
 As with `DjangoModelPermissions`, this permission must only be applied to views that have a `.queryset` property or `.get_queryset()` method. Authorization will only be granted if the user *is authenticated* and has the *relevant per-object permissions* and *relevant model permissions* assigned.
+Как и с `DjangoModelPermissions`, это разрешение может быть применено только для view у которых есть свойство `.queryset` или метод `.get_quryset()`. Авторизация будет возможна только если пользователь *авторизован* и имеет *необходимое разрешение* и подписан *relevant model permissions*.
 
 * `POST` requests require the user to have the `add` permission on the model instance.
+* Запрос `POST`  требует пользователя у которого есть разрешение `add` для экземпляра модели.
 * `PUT` and `PATCH` requests require the user to have the `change` permission on the model instance.
+* `PUT` и `PATCH` требует пользователя к которого есть разрешение `change` для экземпляра модели.
 * `DELETE` requests require the user to have the `delete` permission on the model instance.
+* `DELETE` требует пользователя у которого есть разрешение `delete` для экземпляра модели.
 
 Note that `DjangoObjectPermissions` **does not** require the `django-guardian` package, and should support other object-level backends equally well.
+Имейте ввиду что `DjangoObjectPermissions` **не** требует пакета `django-guardian` и также поддерживать и другие бэкенды объектного уровня.
 
 As with `DjangoModelPermissions` you can use custom model permissions by overriding `DjangoModelPermissions` and setting the `.perms_map` property.  Refer to the source code for details.
-
+Как и в `DjangoModelPermissions` вы можете использовать свою модель разрешений переопределив `DjangoModelPermissions` и  установив свойство `.perms_map`. Обратитель к исходному коду для деталей.
 ---
 
 **Note**: If you need object level `view` permissions for `GET`, `HEAD` and `OPTIONS` requests, you'll want to consider also adding the `DjangoObjectPermissionsFilter` class to ensure that list endpoints only return results including objects for which the user has appropriate view permissions.
+**Примечание**: Если вам нужен объектный уровень разрешений во `view` для `GET`, `HEAD` и `OPRIONS` запросов, вы захотите рассмотреть добавление класса `DjangoObjectPermissionsFilter` для того чтобы убедиться что список конечных точек возвращает результаты включающие объектры для которых пользователь имеет соответсвующее разрешение.
 
 ---
 
 ---
 
-# Custom permissions
+# Custom permissions | Кастомные разрешения
 
 To implement a custom permission, override `BasePermission` and implement either, or both, of the following methods:
+Чтобы применить кастомное разрешение, необходимо переопределить `BasePermission` и применить один из или оба метода:
 
 * `.has_permission(self, request, view)`
 * `.has_object_permission(self, request, view, obj)`
 
 The methods should return `True` if the request should be granted access, and `False` otherwise.
+Методы должны возвращать `True` если запросы получил доступ, и `False` в другом случае.
 
 If you need to test if a request is a read operation or a write operation, you should check the request method against the constant `SAFE_METHODS`, which is a tuple containing `'GET'`, `'OPTIONS'` and `'HEAD'`.  For example:
+Если есть необходимость протестировать методы, это опреации чтения или записи, вам следует проверить методы запроса через константу `SAFE_METHODS` которая является кортежем содержащим `GET`, `OPTIONS` , `HEAD`. Для примера:
 
     if request.method in permissions.SAFE_METHODS:
         # Check permissions for read-only request
@@ -204,10 +241,11 @@ If you need to test if a request is a read operation or a write operation, you s
 ---
 
 **Note**: The instance-level `has_object_permission` method will only be called if the view-level `has_permission` checks have already passed. Also note that in order for the instance-level checks to run, the view code should explicitly call `.check_object_permissions(request, obj)`. If you are using the generic views then this will be handled for you by default.
-
+**Примечание**: Метод уровня экземпляра `has_object_permission` будет только вызван если на уровне view `has_permission` проверка прошла. Также имейте ввиду, что для запуска проверки на уровне экземпляра, код view должен явно вызвать `.check_object_permissions(request, obj)`.Если вы используете generic view, то это будет сделано по умолчанию.
 ---
 
 Custom permissions will raise a `PermissionDenied` exception if the test fails. To change the error message associated with the exception, implement a `message` attribute directly on your custom permission. Otherwise the `default_detail` attribute from `PermissionDenied` will be used.
+Кастомные разрешения будут показывать исключение `PermissionDenied` если тест провалился. Чтобы изменить сообщение ошибки связанное с исключением, используйте атрибут `message` прямо в вашем кастомном разрешение. В обратном случае атрибут `default_detail` из `PermissionDenied` будет использован.
     
     from rest_framework import permissions
 
@@ -217,9 +255,10 @@ Custom permissions will raise a `PermissionDenied` exception if the test fails. 
         def has_permission(self, request, view):
              ...
         
-## Examples
+## Examples | Примеры
 
 The following is an example of a permission class that checks the incoming request's IP address against a blacklist, and denies the request if the IP has been blacklisted.
+Следующий пример разрешающего класса который проверяет входящие IP адреса запросов с черным списком, и отказывает запросам если они есть в черном списке.
 
     from rest_framework import permissions
 
@@ -234,6 +273,7 @@ The following is an example of a permission class that checks the incoming reque
             return not blacklisted
 
 As well as global permissions, that are run against all incoming requests, you can also create object-level permissions, that are only run against operations that affect a particular object instance.  For example:
+Также как и глобальные разрешения, они проверяют все входящие запросы, вы можете также создать разрешение уровня объекта, которые проверяют операции которые влияют на определенный экземпляр. Для примера:
 
     class IsOwnerOrReadOnly(permissions.BasePermission):
         """
@@ -251,26 +291,32 @@ As well as global permissions, that are run against all incoming requests, you c
             return obj.owner == request.user
 
 Note that the generic views will check the appropriate object level permissions, but if you're writing your own custom views, you'll need to make sure you check the object level permission checks yourself.  You can do so by calling `self.check_object_permissions(request, obj)` from the view once you have the object instance.  This call will raise an appropriate `APIException` if any object-level permission checks fail, and will otherwise simply return.
+Заметьте, что generic view будет проверять соответствующее разрешение уровня объекта, но если вы пишите свое кастомное view, вам необходимо будет убедится что разрешение уровня объекта проверяет себя тоже. Вы можете сделать так вызвав `self.check_object_permissions(request, obj)` из view когда получите экземпляр объекта. Этот вызов появится в соответсвии с `APIException` если любое разрешение урованя объекта провалится и в обратном случает просто вернется.
 
 Also note that the generic views will only check the object-level permissions for views that retrieve a single model instance.  If you require object-level filtering of list views, you'll need to filter the queryset separately.  See the [filtering documentation][filtering] for more details.
+Также заметьте, что generic view будет только проверять разрешение уровня объекта для views полученых единственным экземпляром. Если вам нужно фильтровать список views на уровне объекта, вам необходимо отфильтровать queryset отдельно. Смотри [документацию по фильтрованию][filtering] для подроюностей.
 
 ---
 
-# Third party packages
+# Third party packages | Пакерты третих сторон
 
 The following third party packages are also available.
+Слудующие пакеты доступны.
 
-## Composed Permissions
+## Composed Permissions | Составное разрешение
 
 The [Composed Permissions][composed-permissions] package provides a simple way to define complex and multi-depth (with logic operators) permission objects, using small and reusable components.
+Пакет [составного разрешения][composed-permissions] предоставляет простой способ определить сложные и глубокие (с логическими операторами) объекты разрешения, используя небольшие и многоразовые компоненты.
 
-## REST Condition
+## REST Condition | REST условия
 
 The [REST Condition][rest-condition] package is another extension for building complex permissions in a simple and convenient way.  The extension allows you to combine permissions with logical operators.
+Пакет [REST Condition][rest-condition] - это другое расширение для построения сложных разрешений в простой и удобной форме. Расширение позволяет вам комбинировать разрешения с логическими операторами.
 
 ## DRY Rest Permissions
 
 The [DRY Rest Permissions][dry-rest-permissions] package provides the ability to define different permissions for individual default and custom actions. This package is made for apps with permissions that are derived from relationships defined in the app's data model. It also supports permission checks being returned to a client app through the API's serializer. Additionally it supports adding permissions to the default and custom list actions to restrict the data they retrive per user.
+Пакет [DRY Rest Permissions][dry-rest-permissions] предоставляет возможность определять различные разрешения для действий по-умолчанию и переопределенных действий. Этот пакет создан для приложений с правами которые получены от отношений определенных в моделе данных приложения. Он также поддерживает проверки разрешений которые возвращаются в приложение клиента через API сериалайзер. Дополнительно он поддерживает добавление разрешений к списку действий чтобы ограничить данные извлекаемые из каждого пользователя.
 
 [cite]: https://developer.apple.com/library/mac/#documentation/security/Conceptual/AuthenticationAndAuthorizationGuide/Authorization/Authorization.html
 [authentication]: authentication.md
