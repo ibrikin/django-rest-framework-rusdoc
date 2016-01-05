@@ -8,7 +8,7 @@ source: relations.py
 > &mdash; [Linus Torvalds][cite]
 
 
-Relational fields are used to represent model relationships.  They can be applied to `ForeignKey`, `ManyToManyField` and `OneToOneField` relationships, as well as to reverse relationships, and custom relationships such as `GenericForeignKey`.
+Реляционные поля ипользуются для представления отношений между моделями. Они могут быть применены для `ForeignKey`, `ManyToManyField` и `OneToOneField` отношений, а также обратных отношений, и пользовательских отношений таких как `GenericForeignKey`.
 
 ---
 
@@ -405,13 +405,15 @@ In this case we'd need to override `HyperlinkedRelatedField` to get the behavior
         def get_url(self, obj, view_name, request, format):
             url_kwargs = {
                 'organization_slug': obj.organization.slug,
-                'customer_pk': obj.pk            }
+                'customer_pk': obj.pk
+            }
             return reverse(view_name, url_kwargs, request=request, format=format)
 
         def get_object(self, view_name, view_args, view_kwargs):
             lookup_kwargs = {
                'organization__slug': view_kwargs['organization_slug'],
-               'pk': view_kwargs['customer_pk']            }
+               'pk': view_kwargs['customer_pk']
+            }
             return self.get_queryset().get(**lookup_kwargs)
 
 Note that if you wanted to use this style together with the generic views then you'd also need to override `.get_object` on the view in order to get the correct lookup behavior.
