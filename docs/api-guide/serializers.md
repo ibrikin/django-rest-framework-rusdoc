@@ -8,9 +8,9 @@ will take some serious design work.
 >
 > &mdash; Russell Keith-Magee, [Django users group][cite]
 
-Serializers allow complex data such as querysets and model instances to be converted to native Python datatypes that can then be easily rendered into `JSON`, `XML` or other content types.  Serializers also provide deserialization, allowing parsed data to be converted back into complex types, after first validating the incoming data.
+Сериализатор позволяте сложным типам данных типа querysets и экземпляру Джанго модели быть конвертированым в типы данных питона и затем быть просто преобразованы в `JSON`, `XML` или другие типы данных. Сериализаторы также поддерживают обратный процесс, после первой валидации входящих данных.
 
-The serializers in REST framework work very similarly to Django's `Form` and `ModelForm` classes. We provide a `Serializer` class which gives you a powerful, generic way to control the output of your responses, as well as a `ModelSerializer` class which provides a useful shortcut for creating serializers that deal with model instances and querysets.
+Сериализаторы в REST framework работают очень похоже как классы `Form` и `ModelForm` в Джанго. Мы предоставляем класс `Serializer` который дает мощный и обобщенный способ контролировать выходные данные ваших ответов, также хорошо как и класс `ModelSerializer` который предоставляет быстрый доступ к созданию сериализаторов которые работают с экземплярами моделей и querysets.
 
 ## Declaring Serializers
 
