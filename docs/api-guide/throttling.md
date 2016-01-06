@@ -6,15 +6,15 @@ source: throttling.py
 >
 > [Twitter API rate limiting response][cite]
 
-Throttling is similar to [permissions], in that it determines if a request should be authorized.  Throttles indicate a temporary state, and are used to control the rate of requests that clients can make to an API.
+Throttling похож на [разрешения][permission], он определяется если запрос авторизован. Throttles указывает на временное состояние, и используется для контролирования приоритета(рейтинга, скорости, степени) запросов которые клиенты могут осуществить к API.
 
-As with permissions, multiple throttles may be used.  Your API might have a restrictive throttle for unauthenticated requests, and a less restrictive throttle for authenticated requests.
+Как и разрешения, множество throttles могут быть использованы. Ваш API может иметь ограниченичительные throttle для неавторизованных запросов, и менее строгие для авторизованных запросов.
 
-Another scenario where you might want to use multiple throttles would be if you need to impose different constraints on different parts of the API, due to some services being particularly resource-intensive.
+Может быть другой сценарий, где вы возможно захотите использовать несколько trottles, если вам понадобится ввести различные ограничения в разных частях API, из-за сервисов которые особенно ресурсоемки.
 
-Multiple throttles can also be used if you want to impose both burst throttling rates, and sustained throttling rates.  For example, you might want to limit a user to a maximum of 60 requests per minute, and 1000 requests per day.
+Несколько throttles могут таже использоватся если вы хотите использовать как кратковременный throttling, так и долгосрочный. Для примера, вы может захотите ограничить пользователя 60 запросами в минуту, и 1000 запросами в день.
 
-Throttles do not necessarily only refer to rate-limiting requests.  For example a storage service might also need to throttle against bandwidth, and a paid data service might want to throttle against a certain number of a records being accessed.
+Throttles не обязательно связаны с лимитирующими запросами. Для примера сервис хранения данных может нуждаться в ограничении по пропускной способности, а платный сервис может захочет ограничить какое-то количество доступных записей.
 
 ## How throttling is determined
 
