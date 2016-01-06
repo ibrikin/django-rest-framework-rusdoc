@@ -6,9 +6,9 @@ source: validators.py
 >
 > &mdash; [Django documentation][cite]
 
-Most of the time you're dealing with validation in REST framework you'll simply be relying on the default field validation, or writing explicit validation methods on serializer or field classes.
+Большую часть времени когда вы имеете дело с валидацией в REST framework вы просто будете полагаться на поля по умолчянию или писать явные валидационные методы в сериализаторах или классах полей.
 
-However, sometimes you'll want to place your validation logic into reusable components, so that it can easily be reused throughout your codebase. This can be achieved by using validator functions and validator classes.
+Тем не менее, иногда вы захотите поместить вашу валидационную логику во многоразовый компонент, так что он может быть использована в любом месте кода. Это может быть достигнут путем использования функций валидации и классов валидации.
 
 ## Validation in REST framework
 
