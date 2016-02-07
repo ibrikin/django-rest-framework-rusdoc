@@ -1,46 +1,46 @@
-# Tutorial 1: Serialization
+# Руководство 1: Сериализация
 
-## Introduction
+## Введение
 
-This tutorial will cover creating a simple pastebin code highlighting Web API.  Along the way it will introduce the various components that make up REST framework, and give you a comprehensive understanding of how everything fits together.
+Это руководство покрывает процесс создания простого Pastbin сервиса с акцентом на Web API. Заодно познакомит с различными компонентами которые составляют REST framework, и даст полное понимание его работы.
 
-The tutorial is fairly in-depth, so you should probably get a cookie and a cup of your favorite brew before getting started.  If you just want a quick overview, you should head over to the [quickstart] documentation instead.
-
----
-
-**Note**: The code for this tutorial is available in the [tomchristie/rest-framework-tutorial][repo] repository on GitHub.  The completed implementation is also online as a sandbox version for testing, [available here][sandbox].
+Это руководство довольно углубленное, так что вам следует взять печеньки и чашечку чего-нибудь горячего прежде чем начать. Если вы хотите краткий обзор, то следует перейти к [краткой][quickstart] документации.
 
 ---
 
-## Setting up a new environment
+**Примечание**: Код для этого руководства доступен в [tomchristie/rest-framework-tutorial][repo] репозитарии на GitHub. Завершенная реализация также доступна как "песочница" для тестирования [тут][sandbox].
 
-Before we do anything else we'll create a new virtual environment, using [virtualenv].  This will make sure our package configuration is kept nicely isolated from any other projects we're working on.
+---
+
+## Настраиваем новое окружение
+
+Прежде чем что-то делать, мы создадим новое виртуальное окружение используя [virtualenv]. Это обеспечит хорошую изоляцию для нашей конфигурации модулей от любых других проектов над которыми мы работаем.
 
     virtualenv env
     source env/bin/activate
 
-Now that we're inside a virtualenv environment, we can install our package requirements.
+Теперь когда мы внутри виртуального окружения, можно установить необходимые нам пакеты.
 
     pip install django
     pip install djangorestframework
     pip install pygments  # We'll be using this for the code highlighting
 
-**Note:** To exit the virtualenv environment at any time, just type `deactivate`.  For more information see the [virtualenv documentation][virtualenv].
+**Примечание:** Для того чтобы выйти из виртуального окружения, просто наберите `deactivate`.  Подробную информацию смотрите в [документации virtualenv][virtualenv].
 
-## Getting started
+## Начиная
 
-Okay, we're ready to get coding.
-To get started, let's create a new project to work with.
+Хорошо, мы готовы кодить.
+Чтобы начать, давайте создадим новый проект для работы.
 
     cd ~
     django-admin.py startproject tutorial
     cd tutorial
 
-Once that's done we can create an app that we'll use to create a simple Web API.
+Теперь мы можем создать приложение, которое будем использовать для создания простого Web API.
 
     python manage.py startapp snippets
 
-We'll need to add our new `snippets` app and the `rest_framework` app to `INSTALLED_APPS`. Let's edit the `tutorial/settings.py` file:
+Нужно добавить наши новые приложения `snippets` и `rest_framework` в `INSTALLED_APPS`. Для этого отредактируем файл `tutorial/settings.py`:
 
     INSTALLED_APPS = (
         ...
@@ -48,17 +48,17 @@ We'll need to add our new `snippets` app and the `rest_framework` app to `INSTAL
         'snippets',
     )
 
-We also need to wire up the root urlconf, in the `tutorial/urls.py` file, to include our snippet app's URLs.
+Также необходимо подключить корневой urlconf в `tutorial/urls.py`, чтобы включить урл нашего приложения.
 
     urlpatterns = [
         url(r'^', include('snippets.urls')),
     ]
 
-Okay, we're ready to roll.
+Хорошо, мы готовы продолжить.
 
-## Creating a model to work with
+## Создание модели
 
-For the purposes of this tutorial we're going to start by creating a simple `Snippet` model that is used to store code snippets.  Go ahead and edit the `snippets/models.py` file.  Note: Good programming practices include comments.  Although you will find them in our repository version of this tutorial code, we have omitted them here to focus on the code itself.
+Для этого руководства мы создадим простую модель `Snippet` которая будет сохранять наши снипеты. Для этого отредактируем файл `snippets/models.py`. Примечание: Хорошая практика программирования включает комментарии. Хотя вы и встретите их в нашем репозитарии, здесь мы их опустили для концентрации на коде.
 
     from django.db import models
     from pygments.lexers import get_all_lexers
@@ -80,14 +80,14 @@ For the purposes of this tutorial we're going to start by creating a simple `Sni
         class Meta:
             ordering = ('created',)
 
-We'll also need to create an initial migration for our snippet model, and sync the database for the first time.
+Также необходимо инициализировать миграцию для нашей модели и синхронизировать базу данных для первого раза.
 
     python manage.py makemigrations snippets
     python manage.py migrate
 
-## Creating a Serializer class
+## Создание класса Serializer
 
-The first thing we need to get started on our Web API is to provide a way of serializing and deserializing the snippet instances into representations such as `json`.  We can do this by declaring serializers that work very similar to Django's forms.  Create a file in the `snippets` directory named `serializers.py` and add the following.
+Первая вещь которую необходимо сделать для начала в нашем Web API - это предоставить способ сериализации и десериализации экземпляров снипетов в `json`. Мы можем сделать это путем объявления сериализаторов которые работают подобно формам в Django. Создадим файл `serializers.py` в папке `snippets` и добавим следующее:
 
     from rest_framework import serializers
     from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
@@ -119,21 +119,21 @@ The first thing we need to get started on our Web API is to provide a way of ser
             instance.save()
             return instance
 
-The first part of the serializer class defines the fields that get serialized/deserialized.  The `create()` and `update()` methods define how fully fledged instances are created or modified when calling `serializer.save()`
+Первая часть класса определяет поля, которые будут сериализировать/десериализировать. Методы `create()` и `update()` определяют как экземпляры будут создаваться или изменяться когда вызывается `serializer.save()`
 
-A serializer class is very similar to a Django `Form` class, and includes similar validation flags on the various fields, such as `required`, `max_length` and `default`.
+Класс сериализации очень похож на класс `Form` Django фреймворка и включает похожие валидационные флаги для различных полей, такие как `required`, `max_length` и `default`.
 
-The field flags can also control how the serializer should be displayed in certain circumstances, such as when rendering to HTML. The `{'base_template': 'textarea.html'}` flag above is equivalent to using `widget=widgets.Textarea` on a Django `Form` class. This is particularly useful for controlling how the browsable API should be displayed, as we'll see later in the tutorial.
+Флаги полей также могут контролировать как сериалайзер будет отображен в определенных обстоятельствах при рендеринге HTML. Флаг `{'base_template': 'textarea.html'}` указанный выше, эквивалентен использованию `widget=widgets.Textarea` в классе `Form`. Как мы увидим дальше в руководстве, очень полезно контролировать как браузеру следует отображать API.
 
-We can actually also save ourselves some time by using the `ModelSerializer` class, as we'll see later, but for now we'll keep our serializer definition explicit.
+В действительности мы также можем сохранить для себя некоторое время используя класс `ModelSerializer`, как мы увидим позднее, но сейчас мы определили сериалайзер явно.
 
-## Working with Serializers
+## Работаем с сериалайзерами
 
-Before we go any further we'll familiarize ourselves with using our new Serializer class.  Let's drop into the Django shell.
+Прежде чем мы пойдем дальше, мы познакомимся поближе с использованием нашего класса Serializer. Давайте перейдем к Django шеллу.
 
     python manage.py shell
 
-Okay, once we've got a few imports out of the way, let's create a couple of code snippets to work with.
+Хорошо, после того как мы сделаем несколько импортом, давайте создадим пару снипетов для работы.
 
     from snippets.models import Snippet
     from snippets.serializers import SnippetSerializer
@@ -146,26 +146,26 @@ Okay, once we've got a few imports out of the way, let's create a couple of code
     snippet = Snippet(code='print "hello, world"\n')
     snippet.save()
 
-We've now got a few snippet instances to play with.  Let's take a look at serializing one of those instances.
+У нас теперь есть снипеты для работы. Давайте посмотрим на сериализацию одного из них.
 
     serializer = SnippetSerializer(snippet)
     serializer.data
     # {'pk': 2, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}
 
-At this point we've translated the model instance into Python native datatypes.  To finalize the serialization process we render the data into `json`.
+В этом месте мы переводим экземпляр модели в нативные типы данных Питона. Чтобы закончить процесс сериализации мы преобразуем данные в `json`.
 
     content = JSONRenderer().render(serializer.data)
     content
     # '{"pk": 2, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
 
-Deserialization is similar.  First we parse a stream into Python native datatypes...
+Десериализация подобна. Для начала мы парсим поток нативных типов данных Питона...
 
     from django.utils.six import BytesIO
 
     stream = BytesIO(content)
     data = JSONParser().parse(stream)
 
-...then we restore those native datatypes into to a fully populated object instance.
+...затем мы востанавливаем эти нативные типы данных в полностью заполненный экземпляр.
 
     serializer = SnippetSerializer(data=data)
     serializer.is_valid()
@@ -175,29 +175,29 @@ Deserialization is similar.  First we parse a stream into Python native datatype
     serializer.save()
     # <Snippet: Snippet object>
 
-Notice how similar the API is to working with forms.  The similarity should become even more apparent when we start writing views that use our serializer.
+Заметно как похоже это API на работу с формами. Сходство станет более заметным, когда мы начнем писать views используя наш сериалайзер.
 
-We can also serialize querysets instead of model instances.  To do so we simply add a `many=True` flag to the serializer arguments.
+Мы может также сериализовать запросы вместо экземпляра модели. Чтобы сделать так, просто добавьте флаг `many=True` в аргументы сериалайзера. 
 
     serializer = SnippetSerializer(Snippet.objects.all(), many=True)
     serializer.data
     # [{'pk': 1, 'title': u'', 'code': u'foo = "bar"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}, {'pk': 2, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}]
 
-## Using ModelSerializers
+## Использование ModelSerializers
 
-Our `SnippetSerializer` class is replicating a lot of information that's also contained in the `Snippet` model.  It would be nice if we could keep our code a bit  more concise.
+Класс `SnippetSerializer` дублирует много информации, которая уже содержится в модели `Snippet`. Было бы здорово сократить наш код.
 
-In the same way that Django provides both `Form` classes and `ModelForm` classes, REST framework includes both `Serializer` classes, and `ModelSerializer` classes.
+По этой же причине Django содержит класс `Form` и класс `ModelForm`, так и REST фреймворк включает в себя класс `Serializer` и класс `ModelSerializer`.
 
-Let's look at refactoring our serializer using the `ModelSerializer` class.
-Open the file `snippets/serializers.py` again, and replace the `SnippetSerializer` class with the following.
+Давайте посмотрим на рефакторинг нашего сериализатора используя класс `ModelSerializer`. 
+Откроем снова файл `snippets/serializers.py` и заменим класс `SnippetSerializer` следующим.
 
     class SnippetSerializer(serializers.ModelSerializer):
         class Meta:
             model = Snippet
             fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
 
-One nice property that serializers have is that you can inspect all the fields in a serializer instance, by printing its representation. Open the Django shell with `python manage.py shell`, then try the following:
+У сериализатора есть замечательное свойство, которое позволяет просмотреть все поля в экземпляре напечатав его представление. Откройте Django шелл `python manage.py shell` и попробуйте следующее:
 
     >>> from snippets.serializers import SnippetSerializer
     >>> serializer = SnippetSerializer()
@@ -210,19 +210,19 @@ One nice property that serializers have is that you can inspect all the fields i
         language = ChoiceField(choices=[('Clipper', 'FoxPro'), ('Cucumber', 'Gherkin'), ('RobotFramework', 'RobotFramework'), ('abap', 'ABAP'), ('ada', 'Ada')...
         style = ChoiceField(choices=[('autumn', 'autumn'), ('borland', 'borland'), ('bw', 'bw'), ('colorful', 'colorful')...
 
-It's important to remember that `ModelSerializer` classes don't do anything particularly magical, they are simply a shortcut for creating serializer classes:
+Важно помнить, что класс `ModelSerializer` не делает ничего магического, это просто сокращенный способ создания сериализатора:
 
-* An automatically determined set of fields.
-* Simple default implementations for the `create()` and `update()` methods.
+* Автоматически определяет набор полей.
+* Простая реализация методов `create()` и `update()` по умолчанию.
 
-## Writing regular Django views using our Serializer
+## Создание обычного Django view используя наш сериализатор
 
-Let's see how we can write some API views using our new Serializer class.
-For the moment we won't use any of REST framework's other features, we'll just write the views as regular Django views.
+Давайте посмотрим, как мы можем написать API view используя наш новый класс.
+Сейчас мы не будем использовать инструменты REST фреймворка, а просто создадим обычное Django view.
 
-We'll start off by creating a subclass of HttpResponse that we can use to render any data we return into `json`.
+Начнем с создания подкласса HttpResponse который мы будем использовать для преобразования любых данных в `json`.
 
-Edit the `snippets/views.py` file, and add the following.
+Отредактируйте файл `snippets/views.py` и добавьте следующее.
 
     from django.http import HttpResponse
     from django.views.decorators.csrf import csrf_exempt
@@ -240,7 +240,7 @@ Edit the `snippets/views.py` file, and add the following.
             kwargs['content_type'] = 'application/json'
             super(JSONResponse, self).__init__(content, **kwargs)
 
-The root of our API is going to be a view that supports listing all the existing snippets, or creating a new snippet.
+Корень нашего API будет поддерживать вывод списка всех существующий снипетов или создание новых.
 
     @csrf_exempt
     def snippet_list(request):
@@ -260,9 +260,9 @@ The root of our API is going to be a view that supports listing all the existing
                 return JSONResponse(serializer.data, status=201)
             return JSONResponse(serializer.errors, status=400)
 
-Note that because we want to be able to POST to this view from clients that won't have a CSRF token we need to mark the view as `csrf_exempt`.  This isn't something that you'd normally want to do, and REST framework views actually use more sensible behavior than this, but it'll do for our purposes right now.
+Замете что, если мы хотим иметь возможность отправлять POST запросы к нашему view от клиента у которого нет CSRF токена, нам надо использовать `csrf_exempt`. Это не то, что бы вы хотели обычно сделать, и REST фреймворк использует более разумный способ для этого, и этот способ подойдет для наших целей.
 
-We'll also need a view which corresponds to an individual snippet, and can be used to retrieve, update or delete the snippet.
+Нам также понадобится view которое связанно с отдельным снипетом, и может получать, обновлять и удалять снипеты.
 
     @csrf_exempt
     def snippet_detail(request, pk):
@@ -290,7 +290,7 @@ We'll also need a view which corresponds to an individual snippet, and can be us
             snippet.delete()
             return HttpResponse(status=204)
 
-Finally we need to wire these views up.  Create the `snippets/urls.py` file:
+В конце нам нужно подключить эти views. Создадим файл `snippets/urls.py`:
 
     from django.conf.urls import url
     from snippets import views
@@ -300,17 +300,18 @@ Finally we need to wire these views up.  Create the `snippets/urls.py` file:
         url(r'^snippets/(?P<pk>[0-9]+)/$', views.snippet_detail),
     ]
 
-It's worth noting that there are a couple of edge cases we're not dealing with properly at the moment.  If we send malformed `json`, or if a request is made with a method that the view doesn't handle, then we'll end up with a 500 "server error" response.  Still, this'll do for now.
+Стоит отметить, что есть несколько граничных случаев с которыми мы не разобрались должным образом. Если мы отправим неправильно сформированный `json`, или если запрос будет совершен методом, который не обрабатывает view, будет ответ с ошибкой 500. 
 
-## Testing our first attempt at a Web API
 
-Now we can start up a sample server that serves our snippets.
+## Тестирование нашего первого Web API
 
-Quit out of the shell...
+Теперь мы можем запустить образцовый сервер для наших снипетов.
+
+Выйдем из шелла...
 
 	quit()
 
-...and start up Django's development server.
+...и запустим Django сервер.
 
 	python manage.py runserver
 
@@ -321,15 +322,15 @@ Quit out of the shell...
 	Development server is running at http://127.0.0.1:8000/
 	Quit the server with CONTROL-C.
 
-In another terminal window, we can test the server.
+В другом окне терминала, мы сможем тестировать сервер.
 
-We can test our API using using [curl][curl] or [httpie][httpie]. Httpie is a user friendly http client that's written in Python. Let's install that.
+Мы можем тестировать наше API используя [curl][curl] или [httpie][httpie]. Httpie - это дружелюбный http клиент написанный на Python. Давайте установим его.
 
-You can install httpie using pip:
+Вы можете установить httpie используя pip:
 
     pip install httpie
 
-Finally, we can get a list of all of the snippets:
+В итоге мы можем получить список всех снипетов:
 
     http http://127.0.0.1:8000/snippets/
 
@@ -354,7 +355,7 @@ Finally, we can get a list of all of the snippets:
       }
     ]
 
-Or we can get a particular snippet by referencing its id:
+Или мы можем получить определенный снипет по его id: 
 
     http http://127.0.0.1:8000/snippets/2/
 
@@ -369,15 +370,15 @@ Or we can get a particular snippet by referencing its id:
       "style": "friendly"
     }
 
-Similarly, you can have the same json displayed by visiting these URLs in a web browser.
+По аналогии, вы можете получить эти же json через браузер посетив те же URLs.
 
-## Where are we now
+## Где мы сейчас
 
-We're doing okay so far, we've got a serialization API that feels pretty similar to Django's Forms API, and some regular Django views.
+У нас все хорошо получилось, мы создали API для сериализации которое очень похоже на Django Form API, и несколько обычных Django views.
 
-Our API views don't do anything particularly special at the moment, beyond serving `json` responses, and there are some error handling edge cases we'd still like to clean up, but it's a functioning Web API.
+Наши API views не делают ничего особенного в данный момент, кроме обслуживания `json` ответов и некоторой обработки ошибок, связанных с крайними значениями, но это вполне работающее Web API.
 
-We'll see how we can start to improve things in [part 2 of the tutorial][tut-2].
+Во [второй части руководства][tut-2] мы увидим как можно улучшить этот код.
 
 [quickstart]: quickstart.md
 [repo]: https://github.com/tomchristie/rest-framework-tutorial
