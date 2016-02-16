@@ -1,10 +1,10 @@
-# Quickstart
+# Быстрое начало
 
-We're going to create a simple API to allow admin users to view and edit the users and groups in the system.
+Мы собираемся создать простое API которое позволит администраторам просматривать и редактировать пользователей и группы пользователей в системе.
 
-## Project setup
+## Настройки проекта
 
-Create a new Django project named `tutorial`, then start a new app called `quickstart`.
+Создайте новый Django проект `tutorial`, затем создайте новое приложение `quickstart`.
 
     # Create the project directory
     mkdir tutorial
@@ -24,19 +24,19 @@ Create a new Django project named `tutorial`, then start a new app called `quick
     django-admin.py startapp quickstart
     cd ..
 
-Now sync your database for the first time:
+Теперь синхронизируйте вашу базу данных:
 
     python manage.py migrate
 
-We'll also create an initial user named `admin` with a password of `password`. We'll authenticate as that user later in our example.
+Мы также создадим пользователя `admin` с паролем `password`. Мы будем авторизоваться под этим пользователем позднее в нашем примере.
 
     python manage.py createsuperuser
 
-Once you've set up a database and initial user created and ready to go, open up the app's directory and we'll get coding...
+После того, как вы настроили базу данных и создали пользователя вы готовы продолжить, откроем папку с приложением и начнем...
 
-## Serializers
+## Сериализаторы
 
-First up we're going to define some serializers. Let's create a new module named `tutorial/quickstart/serializers.py` that we'll use for our data representations.
+Сначала мы определим сериализаторы. Давайте создадим новый модуль `tutorial/quickstart/serializers.py` который мы будем использовать для представления данных.
 
     from django.contrib.auth.models import User, Group
     from rest_framework import serializers
@@ -53,11 +53,11 @@ First up we're going to define some serializers. Let's create a new module named
             model = Group
             fields = ('url', 'name')
 
-Notice that we're using hyperlinked relations in this case, with `HyperlinkedModelSerializer`.  You can also use primary key and various other relationships, but hyperlinking is good RESTful design.
+Заметьте, что мы используем гиперлинковое отношение в данном случае, с `HyperlinkedModelSerializer` . Вы также можете использовать первичный ключ и множество других отношений, но гиперлинк хорошо подходит для RESTful.
 
 ## Views
 
-Right, we'd better write some views then.  Open `tutorial/quickstart/views.py` and get typing.
+Теперь напишем немного во view. Откроем `tutorial/quickstart/views.py` и напечатаем:
 
     from django.contrib.auth.models import User, Group
     from rest_framework import viewsets
@@ -79,13 +79,13 @@ Right, we'd better write some views then.  Open `tutorial/quickstart/views.py` a
         queryset = Group.objects.all()
         serializer_class = GroupSerializer
 
-Rather than write multiple views we're grouping together all the common behavior into classes called `ViewSets`.
+Вместо того чтобы писать несколько views, мы сгруппировали общие поведения в класс `ViewSets`.
 
-We can easily break these down into individual views if we need to, but using viewsets keeps the view logic nicely organized as well as being very concise.
+Мы можем просто разделить его на отдельные views если есть необходимость, но использование класса ViewSets позволяет сократить код и организовать логику.
 
 ## URLs
 
-Okay, now let's wire up the API URLs.  On to `tutorial/urls.py`...
+Хорошо, теперь давайте подключим к API урлы в `tutorial/urls.py`...
 
     from django.conf.urls import url, include
     from rest_framework import routers
@@ -102,15 +102,15 @@ Okay, now let's wire up the API URLs.  On to `tutorial/urls.py`...
         url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     ]
 
-Because we're using viewsets instead of views, we can automatically generate the URL conf for our API, by simply registering the viewsets with a router class.
+Так как мы используем класс ViewSet вместо View, мы можем автоматически сгенерировать URLconf для нашего API, просто зарегистрировав ViewSets в модуле routers.
 
-Again, if we need more control over the API URLs we can simply drop down to using regular class based views, and writing the URL conf explicitly.
+Опять, если мы нуждаемся в большем контроле над API URLs мы можем просто использовать обычный класс View и прописать URLconf явно.
 
-Finally, we're including default login and logout views for use with the browsable API.  That's optional, but useful if your API requires authentication and you want to use the browsable API.
+В итоге, мы включим стандартный View для логирование и выхода чтобы использовать в браузере. Это опционально, но полезно если ваше API требует авторизации, и вы хотите использовать браузер для просмотра.
 
-## Settings
+## Параметры настройки
 
-We'd also like to set a few global settings.  We'd like to turn on pagination, and we want our API to only be accessible to admin users.  The settings module will be in `tutorial/settings.py`
+Мы также хотели бы установить несколько глобальных свойств. Мы бы включили возможность переключения по страницам, и мы хотели бы чтобы наше API было доступно только админу. Для этого отредактируем `tutorial/settings.py`
 
     INSTALLED_APPS = (
         ...
@@ -122,17 +122,17 @@ We'd also like to set a few global settings.  We'd like to turn on pagination, a
         'PAGE_SIZE': 10
     }
 
-Okay, we're done.
+Хорошо, API готово.
 
 ---
 
-## Testing our API
+## Тестирование нашего API
 
-We're now ready to test the API we've built.  Let's fire up the server from the command line.
+Теперь мы готовы к тестированию нашего API. Давайте запустим сервер из командной строки.
 
     python ./manage.py runserver
 
-We can now access our API, both from the command-line, using tools like `curl`...
+Мы можем достучаться до нашего API используя командную строку, либо используя `curl`...
 
     bash: curl -H 'Accept: application/json; indent=4' -u admin:password http://127.0.0.1:8000/users/
     {
@@ -155,7 +155,7 @@ We can now access our API, both from the command-line, using tools like `curl`..
         ]
     }
 
-Or using the [httpie][httpie], command line tool...
+Либо используя [httpie][httpie]...
 
     bash: http -a username:password http://127.0.0.1:8000/users/
 
@@ -182,15 +182,15 @@ Or using the [httpie][httpie], command line tool...
     }
 
 
-Or directly through the browser...
+Или просто используя браузер...
 
 ![Quick start image][image]
 
-If you're working through the browser, make sure to login using the control in the top right corner.
+Если вы используете браузер, убедитесь, что вы залогинились.
 
-Great, that was easy!
+Это было просто!
 
-If you want to get a more in depth understanding of how REST framework fits together head on over to [the tutorial][tutorial], or start browsing the [API guide][guide].
+Если вы хотите более глубокого понимания работы REST фраймворка следуйте [руководству][tutorial], или начните изучение [API][guide].
 
 [readme-example-api]: ../#example
 [image]: ../img/quickstart.png
