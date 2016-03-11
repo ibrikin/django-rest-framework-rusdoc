@@ -1,41 +1,40 @@
-# Tutorial 2: Requests and Responses
+# Руководство 2: Запросы и Ответы
 
-From this point we're going to really start covering the core of REST framework.
-Let's introduce a couple of essential building blocks.
+В этой части руководства мы начнем с основ REST фреймворка. Позвольте представить основные строительные блоки фреймворка.
 
-## Request objects
+## Объекты Request
 
-REST framework introduces a `Request` object that extends the regular `HttpRequest`, and provides more flexible request parsing.  The core functionality of the `Request` object is the `request.data` attribute, which is similar to `request.POST`, but more useful for working with Web APIs.
+REST фрeймворк использует объект `Request` который расширяет обычный `HttpRequest` и предоставляет более гибкий способ парсить запросы. Ключевая функциональность объекта `Request` заключена в атрибуте `request.data`, который похож на `request.POST`, но лучше для работы с Web API.
 
     request.POST  # Only handles form data.  Only works for 'POST' method.
     request.data  # Handles arbitrary data.  Works for 'POST', 'PUT' and 'PATCH' methods.
 
-## Response objects
+## Объекты Response
 
-REST framework also introduces a `Response` object, which is a type of `TemplateResponse` that takes unrendered content and uses content negotiation to determine the correct content type to return to the client.
+REST фрeймворк также использует объект `Response`, который похож на `TemplateResponse` принимающий необработанный контент и использующий согласование содержания чтобы определить правильный тип контента для того, чтобы вернуть клиенту.
 
     return Response(data)  # Renders to content type as requested by the client.
 
-## Status codes
+## Коды состояния
 
-Using numeric HTTP status codes in your views doesn't always make for obvious reading, and it's easy to not notice if you get an error code wrong.  REST framework provides more explicit identifiers for each status code, such as `HTTP_400_BAD_REQUEST` in the `status` module.  It's a good idea to use these throughout rather than using numeric identifiers.
+Использование множества HTTP кодов состояния во view делает неочевидным чтение этого кода, и легко не заметить ошибку. REST фреймворк предоставляет более явный способ определить каждый статус, например, `HTTP_400_BAD_REQUEST` в модуле `status`. Это хорошая идея использовать такие коды, нежели использовать численные идентификаторы.
 
-## Wrapping API views
+## Оборачиваем API views
 
-REST framework provides two wrappers you can use to write API views.
+REST фреймворк предоставляет два способа обернуть API views.
 
-1. The `@api_view` decorator for working with function based views.
-2. The `APIView` class for working with class based views.
+1. Декоратор `@api_view` для работы с view на основе функций.
+2. Класс `APIView` для работы с view на основе классов.
 
-These wrappers provide a few bits of functionality such as making sure you receive `Request` instances in your view, and adding context to `Response` objects so that content negotiation can be performed.
+Эти обертки предоставляют некоторую функциональность: возможность убедится, что вы получили экземпляр `Request` в вашем view, и добавление контекста в объект `Response` так, что согласование содержимого может быть произведено.
 
-The wrappers also provide behaviour such as returning `405 Method Not Allowed` responses when appropriate, and handling any `ParseError` exception that occurs when accessing `request.data` with malformed input.
+Обертывание также позволяет вернуть при случае ответы `405 Method Not Allowed` и обработать любое `ParseError` исключение которое появляется при доступе к `request.data` с испорченными данными.
 
-## Pulling it all together
+## Объеденим все вместе
 
-Okay, let's go ahead and start using these new components to write a few views.
+Хорошо, давайте пойдем дальше и начнем использовать эти новые компоненты чтобы написать несколько views.
 
-We don't need our `JSONResponse` class in `views.py` anymore, so go ahead and delete that.  Once that's done we can start refactoring our views slightly.
+У нас нет больше нужды в нашем классе `JSONResponse` во `views.py`, так что удалим его. После этого мы можем начать рефакторить наше view.
 
     from rest_framework import status
     from rest_framework.decorators import api_view
@@ -61,9 +60,9 @@ We don't need our `JSONResponse` class in `views.py` anymore, so go ahead and de
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-Our instance view is an improvement over the previous example.  It's a little more concise, and the code now feels very similar to if we were working with the Forms API.  We're also using named status codes, which makes the response meanings more obvious.
+Теперь наше view лучше предыдущего примера. Оно немного короче и код похож по структуре если бы мы работали с Forms API. Мы также используем именованные коды состояния, которые создают значения ответов более очевидными.
 
-Here is the view for an individual snippet, in the `views.py` module.
+Это view для отдельного снипета, в модуле `views.py`.
 
     @api_view(['GET', 'PUT', 'DELETE'])
     def snippet_detail(request, pk):
@@ -90,23 +89,23 @@ Here is the view for an individual snippet, in the `views.py` module.
             snippet.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-This should all feel very familiar - it is not a lot different from working with regular Django views.
+Должно быть это все очень знакомо, потому что тут нет больших отличий от обычный Django views.
 
-Notice that we're no longer explicitly tying our requests or responses to a given content type.  `request.data` can handle incoming `json` requests, but it can also handle other formats.  Similarly we're returning response objects with data, but allowing REST framework to render the response into the correct content type for us.
+Заметьте, что мы теперь не явно связываем наши запросы или ответы с типом контента. `request.data` может обрабатывать входящие `json` запросы, но также он может обрабатывать и другие форматы. Аналогично мы возвращаем объекты ответа с данными, но позволяем REST фреймворку обработать ответ в нужный тип контента для нас.
 
-## Adding optional format suffixes to our URLs
+## Добавление опционального расширения для урла
 
-To take advantage of the fact that our responses are no longer hardwired to a single content type let's add support for format suffixes to our API endpoints.  Using format suffixes gives us URLs that explicitly refer to a given format, and means our API will be able to handle URLs such as [http://example.com/api/items/4/.json][json-url].
+Воспользуемся тем, что наши ответы не привязаны к одному типу контента и добавим поддержку расширений. Это позволит нам явно указывать получаемый формат и означает, что наше API будет принимать URL подобного вида [http://example.com/api/items/4/.json][json-url].
 
-Start by adding a `format` keyword argument to both of the views, like so.
+Начнем с добавления аргумента `format` к обоим views
 
     def snippet_list(request, format=None):
 
-and
+и
 
     def snippet_detail(request, pk, format=None):
 
-Now update the `urls.py` file slightly, to append a set of `format_suffix_patterns` in addition to the existing URLs.
+Теперь обновим немного файл `urls.py` добавив набор `format_suffix_patterns` к существующим урлам.
 
     from django.conf.urls import url
     from rest_framework.urlpatterns import format_suffix_patterns
@@ -119,13 +118,13 @@ Now update the `urls.py` file slightly, to append a set of `format_suffix_patter
 
     urlpatterns = format_suffix_patterns(urlpatterns)
 
-We don't necessarily need to add these extra url patterns in, but it gives us a simple, clean way of referring to a specific format.
+Не обязательно добавлять эти дополнительные паттерны, но это дает нам простой и ясный путь к назначению определенных форматов.
 
-## How's it looking?
+## Как это выглядит?
 
-Go ahead and test the API from the command line, as we did in [tutorial part 1][tut-1].  Everything is working pretty similarly, although we've got some nicer error handling if we send invalid requests.
+Давайте протестируем наше API в командной строке, как мы делали в [первой части руководства][tut-1]. Все работает очень похоже, но если мы отправил неверный запрос, то получим обработчик ошибок.
 
-We can get a list of all of the snippets, as before.
+Мы можем получить список всех снипетов как и прежде.
 
     http http://127.0.0.1:8000/snippets/
 
@@ -150,17 +149,17 @@ We can get a list of all of the snippets, as before.
       }
     ]
 
-We can control the format of the response that we get back, either by using the `Accept` header:
+Мы можем контролировать формат ответа используя хедер `Accept`:
 
     http http://127.0.0.1:8000/snippets/ Accept:application/json  # Request JSON
     http http://127.0.0.1:8000/snippets/ Accept:text/html         # Request HTML
 
-Or by appending a format suffix:
+Или добавлением расширения:
 
     http http://127.0.0.1:8000/snippets.json  # JSON suffix
     http http://127.0.0.1:8000/snippets.api   # Browsable API suffix
 
-Similarly, we can control the format of the request that we send, using the `Content-Type` header.
+Подобно, мы можем контролировать формат запроса, используя хедер `Content-Type`.
 
     # POST using form data
     http --form POST http://127.0.0.1:8000/snippets/ code="print 123"
@@ -186,19 +185,19 @@ Similarly, we can control the format of the request that we send, using the `Con
         "style": "friendly"
     }
 
-Now go and open the API in a web browser, by visiting [http://127.0.0.1:8000/snippets/][devserver].
+Теперь откройте API в браузере, посетив [http://127.0.0.1:8000/snippets/][devserver]
 
-### Browsability
+### Browsability 
 
-Because the API chooses the content type of the response based on the client request, it will, by default, return an HTML-formatted representation of the resource when that resource is requested by a web browser.  This allows for the API to return a fully web-browsable HTML representation.
+Так как API выбрало тип контента ответа на основе клиентского запроса, то по умолчанию, вернет HTML отфарматированный ресурс когда он будет вызван веб браузером. Это позволяет API возвращать полностью веб ориентированное представление.
 
-Having a web-browsable API is a huge usability win, and makes developing and using your API much easier.  It also dramatically lowers the barrier-to-entry for other developers wanting to inspect and work with your API.
+Обладание вебориентированным API это большая пользовательская победа, которая делает разработку и использование API на много проще. Это также низкий барьер вхождения для других разработчиков которые захотят посмотреть и использовать это API.
 
-See the [browsable api][browsable-api] topic for more information about the browsable API feature and how to customize it.
+Смотри тему [api в браузере][browsable-api] для дополнительной информации о фичах вебориентированного API и как его адаптированить под свои нужды.
 
-## What's next?
+## Что дальше?
 
-In [tutorial part 3][tut-3], we'll start using class based views, and see how generic views reduce the amount of code we need to write.
+В [части третьей][tut-3] мы начнем использовать views на основе классов и увидим как общие view сокращают количество кода.
 
 [json-url]: http://example.com/api/items/4/.json
 [devserver]: http://127.0.0.1:8000/snippets/
